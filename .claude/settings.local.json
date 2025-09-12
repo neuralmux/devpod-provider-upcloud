@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(go mod init:*)",
+      "Bash(go get:*)",
+      "Bash(go mod:*)",
+      "Bash(make:*)",
+      "Bash(./bin/devpod-provider-upcloud:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

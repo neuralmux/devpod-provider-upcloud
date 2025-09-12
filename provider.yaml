@@ -1,0 +1,148 @@
+name: upcloud
+version: 0.1.0
+description: |-
+  DevPod on UpCloud
+icon: https://upcloud.com/favicon.ico
+optionGroups:
+  - options:
+      - UPCLOUD_STORAGE
+      - UPCLOUD_IMAGE
+      - UPCLOUD_PLAN
+    name: "UpCloud options"
+  - options:
+      - AGENT_PATH
+      - AGENT_DATA_PATH
+      - INACTIVITY_TIMEOUT
+      - INJECT_DOCKER_CREDENTIALS
+      - INJECT_GIT_CREDENTIALS
+    name: "Agent options"
+options:
+  UPCLOUD_USERNAME:
+    description: The UpCloud API username to use.
+    required: true
+    password: false
+    command: |-
+      if [ ! -z "${UPCLOUD_USERNAME}" ]; then
+        echo ${UPCLOUD_USERNAME}
+      fi
+  
+  UPCLOUD_PASSWORD:
+    description: The UpCloud API password to use.
+    required: true
+    password: true
+    command: |-
+      if [ ! -z "${UPCLOUD_PASSWORD}" ]; then
+        echo ${UPCLOUD_PASSWORD}
+      fi
+  
+  UPCLOUD_ZONE:
+    description: The UpCloud zone to use. E.g. de-fra1
+    required: true
+    default: de-fra1
+    suggestions:
+      - de-fra1
+      - fi-hel1
+      - fi-hel2
+      - nl-ams1
+      - uk-lon1
+      - us-nyc1
+      - us-chi1
+      - us-sjo1
+      - sg-sin1
+      - au-syd1
+  
+  UPCLOUD_STORAGE:
+    description: The disk size in GB.
+    default: "50"
+  
+  UPCLOUD_IMAGE:
+    description: The operating system image to use.
+    default: Ubuntu Server 22.04 LTS (Jammy Jellyfish)
+    suggestions:
+      - Ubuntu Server 22.04 LTS (Jammy Jellyfish)
+      - Ubuntu Server 20.04 LTS (Focal Fossa)
+      - Debian 11 (Bullseye)
+      - Debian 12 (Bookworm)
+      - Rocky Linux 9
+      - AlmaLinux 9
+  
+  UPCLOUD_PLAN:
+    description: The server plan to use.
+    default: 2xCPU-4GB
+    suggestions:
+      - 1xCPU-1GB
+      - 1xCPU-2GB
+      - 2xCPU-4GB
+      - 4xCPU-8GB
+      - 6xCPU-16GB
+      - 8xCPU-32GB
+  
+  INACTIVITY_TIMEOUT:
+    description: If defined, will automatically stop the VM after the inactivity period.
+    default: 10m
+  
+  INJECT_GIT_CREDENTIALS:
+    description: "If DevPod should inject git credentials into the remote host."
+    default: "true"
+  
+  INJECT_DOCKER_CREDENTIALS:
+    description: "If DevPod should inject docker credentials into the remote host."
+    default: "true"
+  
+  AGENT_PATH:
+    description: The path where to inject the DevPod agent to.
+    default: /home/devpod/.devpod/devpod
+  
+  AGENT_DATA_PATH:
+    description: The path where to store the agent data.
+    default: /home/devpod/.devpod/agent
+
+agent:
+  path: ${AGENT_PATH}
+  dataPath: ${AGENT_DATA_PATH}
+  inactivityTimeout: ${INACTIVITY_TIMEOUT}
+  injectGitCredentials: ${INJECT_GIT_CREDENTIALS}
+  injectDockerCredentials: ${INJECT_DOCKER_CREDENTIALS}
+  binaries:
+    UC_PROVIDER:
+      - os: linux
+        arch: amd64
+        path: https://github.com/neuralmux/devpod-provider-upcloud/releases/download/##VERSION##/devpod-provider-upcloud-linux-amd64
+        checksum: ##CHECKSUM_LINUX_AMD64##
+      - os: linux
+        arch: arm64
+        path: https://github.com/neuralmux/devpod-provider-upcloud/releases/download/##VERSION##/devpod-provider-upcloud-linux-arm64
+        checksum: ##CHECKSUM_LINUX_ARM64##
+  exec:
+    shutdown: |-
+      ${UC_PROVIDER} stop
+binaries:
+  UC_PROVIDER:
+    - os: linux
+      arch: amd64
+      path: https://github.com/neuralmux/devpod-provider-upcloud/releases/download/##VERSION##/devpod-provider-upcloud-linux-amd64
+      checksum: ##CHECKSUM_LINUX_AMD64##
+    - os: linux
+      arch: arm64
+      path: https://github.com/neuralmux/devpod-provider-upcloud/releases/download/##VERSION##/devpod-provider-upcloud-linux-arm64
+      checksum: ##CHECKSUM_LINUX_ARM64##
+    - os: darwin
+      arch: amd64
+      path: https://github.com/neuralmux/devpod-provider-upcloud/releases/download/##VERSION##/devpod-provider-upcloud-darwin-amd64
+      checksum: ##CHECKSUM_DARWIN_AMD64##
+    - os: darwin
+      arch: arm64
+      path: https://github.com/neuralmux/devpod-provider-upcloud/releases/download/##VERSION##/devpod-provider-upcloud-darwin-arm64
+      checksum: ##CHECKSUM_DARWIN_ARM64##
+    - os: windows
+      arch: amd64
+      path: https://github.com/neuralmux/devpod-provider-upcloud/releases/download/##VERSION##/devpod-provider-upcloud-windows-amd64.exe
+      checksum: ##CHECKSUM_WINDOWS_AMD64##
+exec:
+  init: ${UC_PROVIDER} init
+  command: ${UC_PROVIDER} command
+  create: ${UC_PROVIDER} create
+  delete: ${UC_PROVIDER} delete
+  start: ${UC_PROVIDER} start
+  stop: ${UC_PROVIDER} stop
+  status: ${UC_PROVIDER} status
