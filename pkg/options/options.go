@@ -63,6 +63,41 @@ func FromEnv(skipMachine bool) (*Options, error) {
 	return retOptions, nil
 }
 
+// FromEnvInit is like FromEnv but only requires credentials for init command
+func FromEnvInit() (*Options, error) {
+	retOptions := &Options{}
+
+	var err error
+	retOptions.Username, err = fromEnvOrError("UPCLOUD_USERNAME")
+	if err != nil {
+		return nil, err
+	}
+	retOptions.Password, err = fromEnvOrError("UPCLOUD_PASSWORD")
+	if err != nil {
+		return nil, err
+	}
+
+	// Set defaults for other fields (not required for init)
+	retOptions.Zone = os.Getenv("UPCLOUD_ZONE")
+	if retOptions.Zone == "" {
+		retOptions.Zone = "de-fra1"
+	}
+	retOptions.Plan = os.Getenv("UPCLOUD_PLAN")
+	if retOptions.Plan == "" {
+		retOptions.Plan = "2xCPU-4GB"
+	}
+	retOptions.Storage = os.Getenv("UPCLOUD_STORAGE")
+	if retOptions.Storage == "" {
+		retOptions.Storage = "50"
+	}
+	retOptions.Image = os.Getenv("UPCLOUD_IMAGE")
+	if retOptions.Image == "" {
+		retOptions.Image = "Ubuntu Server 22.04 LTS (Jammy Jellyfish)"
+	}
+
+	return retOptions, nil
+}
+
 func fromEnvOrError(name string) (string, error) {
 	val := os.Getenv(name)
 	if val == "" {

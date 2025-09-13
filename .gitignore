@@ -45,6 +45,7 @@ Thumbs.db
 
 # Provider binary
 devpod-provider-upcloud
+test-provider
 
 # Test artifacts
 test-results/
