@@ -115,7 +115,7 @@ jobs:
           go-version: '1.25'
 
       - name: Nancy vulnerability scan
-        uses: sonatypecommunity/nancy-github-action@main
+        uses: sonatype-nexus-community/nancy-github-action@main
         with:
           nancyCommand: sleuth --loud
 
