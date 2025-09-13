@@ -35,13 +35,13 @@ func NewStatusCmd() *cobra.Command {
 // Run runs the command logic
 func (cmd *StatusCmd) Run(ctx context.Context, options *options.Options, log log.Logger) error {
 	client := upcloud.NewUpCloud(options.Username, options.Password)
-	
+
 	status, err := client.Status(ctx, options.MachineID)
 	if err != nil {
 		fmt.Println("NotFound")
 		return nil
 	}
-	
+
 	// Print status for DevPod to consume
 	fmt.Println(status)
 	return nil

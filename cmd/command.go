@@ -59,7 +59,9 @@ func (cmd *CommandCmd) Run(ctx context.Context, options *options.Options, log lo
 	if err != nil {
 		return errors.Wrap(err, "create ssh client")
 	}
-	defer sshClient.Close()
+	defer func() {
+		_ = sshClient.Close()
+	}()
 
 	// Run the command
 	return devpodssh.Run(ctx, sshClient, command, os.Stdin, os.Stdout, os.Stderr)

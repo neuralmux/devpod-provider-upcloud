@@ -1,13 +1,10 @@
 package main
 
 import (
-	"math/rand"
-	"time"
-
 	"github.com/neuralmux/devpod-provider-upcloud/cmd"
 )
 
 func main() {
-	rand.Seed(time.Now().UTC().UnixNano())
+	// As of Go 1.20, the random number generator is automatically seeded
 	cmd.Execute()
 }

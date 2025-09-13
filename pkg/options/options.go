@@ -9,12 +9,12 @@ type Options struct {
 	MachineID     string
 	MachineFolder string
 
-	Zone         string
-	Plan         string
-	Storage      string
-	Image        string
-	Username     string
-	Password     string
+	Zone     string
+	Plan     string
+	Storage  string
+	Image    string
+	Username string
+	Password string
 }
 
 func FromEnv(skipMachine bool) (*Options, error) {
@@ -28,7 +28,7 @@ func FromEnv(skipMachine bool) (*Options, error) {
 		}
 		// prefix with devpod-
 		retOptions.MachineID = "devpod-" + retOptions.MachineID
-		
+
 		retOptions.MachineFolder, err = fromEnvOrError("MACHINE_FOLDER")
 		if err != nil {
 			return nil, err

@@ -34,13 +34,13 @@ func NewStartCmd() *cobra.Command {
 // Run runs the command logic
 func (cmd *StartCmd) Run(ctx context.Context, options *options.Options, log log.Logger) error {
 	client := upcloud.NewUpCloud(options.Username, options.Password)
-	
+
 	log.Infof("Starting server %s...", options.MachineID)
 	err := client.Start(ctx, options.MachineID)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Infof("Successfully started server %s", options.MachineID)
 	return nil
 }

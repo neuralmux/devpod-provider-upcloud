@@ -34,7 +34,7 @@ func NewDeleteCmd() *cobra.Command {
 // Run runs the command logic
 func (cmd *DeleteCmd) Run(ctx context.Context, options *options.Options, log log.Logger) error {
 	client := upcloud.NewUpCloud(options.Username, options.Password)
-	
+
 	log.Infof("Deleting server %s...", options.MachineID)
 	err := client.Delete(ctx, options.MachineID)
 	if err != nil {
@@ -42,7 +42,7 @@ func (cmd *DeleteCmd) Run(ctx context.Context, options *options.Options, log log
 		// Don't fail if server doesn't exist
 		return nil
 	}
-	
+
 	log.Infof("Successfully deleted server %s", options.MachineID)
 	return nil
 }

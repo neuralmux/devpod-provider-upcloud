@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+env:
+  GO_VERSION: '1.21'
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests before release
+        run: make test-all
+        env:
+          UPCLOUD_USERNAME: test
+          UPCLOUD_PASSWORD: test
+          UPCLOUD_ZONE: de-fra1
+          UPCLOUD_PLAN: 2xCPU-4GB
+          UPCLOUD_STORAGE: "50"
+          UPCLOUD_IMAGE: "Ubuntu Server 22.04 LTS (Jammy Jellyfish)"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update provider.yaml version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          sed -i "s/version: .*/version: ${TAG#v}/" provider.yaml
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add provider.yaml
+          git commit -m "Update provider.yaml version to ${TAG#v}" || true
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update provider.yaml with release URLs and checksums
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+
+          # Download checksums
+          curl -s -L "https://github.com/neuralmux/devpod-provider-upcloud/releases/download/$TAG/checksums.txt" > checksums.txt
+
+          # Extract checksums
+          LINUX_AMD64_CHECKSUM=$(grep "devpod-provider-upcloud-linux-amd64" checksums.txt | cut -d' ' -f1)
+          LINUX_ARM64_CHECKSUM=$(grep "devpod-provider-upcloud-linux-arm64" checksums.txt | cut -d' ' -f1)
+          DARWIN_AMD64_CHECKSUM=$(grep "devpod-provider-upcloud-darwin-amd64" checksums.txt | cut -d' ' -f1)
+          DARWIN_ARM64_CHECKSUM=$(grep "devpod-provider-upcloud-darwin-arm64" checksums.txt | cut -d' ' -f1)
+          WINDOWS_AMD64_CHECKSUM=$(grep "devpod-provider-upcloud-windows-amd64.exe" checksums.txt | cut -d' ' -f1)
+
+          # Update provider.yaml with real URLs and checksums
+          sed -i "s/##VERSION##/$VERSION/g" provider.yaml
+          sed -i "s/##CHECKSUM_LINUX_AMD64##/$LINUX_AMD64_CHECKSUM/g" provider.yaml
+          sed -i "s/##CHECKSUM_LINUX_ARM64##/$LINUX_ARM64_CHECKSUM/g" provider.yaml
+          sed -i "s/##CHECKSUM_DARWIN_AMD64##/$DARWIN_AMD64_CHECKSUM/g" provider.yaml
+          sed -i "s/##CHECKSUM_DARWIN_ARM64##/$DARWIN_ARM64_CHECKSUM/g" provider.yaml
+          sed -i "s/##CHECKSUM_WINDOWS_AMD64##/$WINDOWS_AMD64_CHECKSUM/g" provider.yaml
+        continue-on-error: true
+
+      - name: Upload updated provider.yaml as release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./provider.yaml
+          asset_name: provider.yaml
+          asset_content_type: application/x-yaml
+        continue-on-error: true
+
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: release
+    if: always()
+    steps:
+      - name: Notify on success
+        if: needs.release.result == 'success'
+        run: |
+          echo "🎉 Release successful! New version is now available."
+          echo "Users can install with: devpod provider add github.com/neuralmux/devpod-provider-upcloud@${GITHUB_REF#refs/tags/}"
+
+      - name: Notify on failure
+        if: needs.release.result == 'failure'
+        run: |
+          echo "❌ Release failed. Please check the logs and try again."
+

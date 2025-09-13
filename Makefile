@@ -15,15 +15,15 @@ build:
 	@mkdir -p $(BUILD_DIR)
 	$(GO) build $(GOFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) .
 
-# Run tests
+# Run tests (exclude integration tests)
 test:
 	@echo "Running unit tests..."
-	$(GO) test -v ./...
+	$(GO) test -v -timeout=5m ./cmd/... ./pkg/...
 
 # Run BDD tests with Godog
 bdd:
 	@echo "Running BDD tests..."
-	$(GO) test -v -run TestFeatures
+	$(GO) test -v -tags=integration -run TestFeatures
 
 # Run all tests (unit + BDD)
 test-all: test bdd
@@ -101,3 +101,7 @@ help:
 	@echo "  coverage   - Generate test coverage report"
 	@echo "  security   - Check for security issues (requires gosec)"
 	@echo "  help       - Show this help message"
+# Comprehensive pre-push validation (mirrors CI/CD)
+pre-push:
+	@echo "🚀 Running comprehensive pre-push validation..."
+	./scripts/pre-push.sh

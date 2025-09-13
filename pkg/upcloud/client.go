@@ -19,13 +19,13 @@ type Client struct {
 
 // ServerConfig holds the configuration for creating a new server
 type ServerConfig struct {
-	Hostname  string
-	Zone      string
-	Plan      string
-	Storage   string
-	Image     string
-	SSHKey    string
-	UserData  string
+	Hostname string
+	Zone     string
+	Plan     string
+	Storage  string
+	Image    string
+	SSHKey   string
+	UserData string
 }
 
 // NewUpCloud creates a new UpCloud client
@@ -38,13 +38,13 @@ func NewUpCloud(username, password string) *Client {
 			timeout: time.Duration(DefaultTimeout) * time.Second,
 		}
 	}
-	
+
 	// Create client with timeout
-	httpClient := client.New(username, password, client.WithTimeout(time.Second * 30))
-	
+	httpClient := client.New(username, password, client.WithTimeout(time.Second*30))
+
 	// Create service
 	svc := service.New(httpClient)
-	
+
 	return &Client{
 		service: svc,
 		timeout: time.Duration(DefaultTimeout) * time.Second,
@@ -58,18 +58,18 @@ func (c *Client) TestConnection(ctx context.Context) error {
 		fmt.Println("Test mode: Simulating successful authentication")
 		return nil
 	}
-	
+
 	// Try to get account information to verify credentials
 	account, err := c.service.GetAccount(ctx)
 	if err != nil {
 		return WrapError(err, "authentication test")
 	}
-	
+
 	// Check if account is valid
 	if account.UserName == "" {
 		return fmt.Errorf("invalid account response")
 	}
-	
+
 	return nil
 }
 
@@ -79,28 +79,28 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 	if err := ValidateZone(config.Zone); err != nil {
 		return WrapError(err, "zone validation")
 	}
-	
+
 	// Map plan name
 	plan, err := MapPlanName(config.Plan)
 	if err != nil {
 		return WrapError(err, "plan mapping")
 	}
-	
+
 	// Map image to template UUID
 	templateUUID, err := MapImageToTemplate(config.Image)
 	if err != nil {
 		return WrapError(err, "image mapping")
 	}
-	
+
 	// Parse storage size
 	storageSize, err := ParseStorageSize(config.Storage)
 	if err != nil {
 		return WrapError(err, "storage size parsing")
 	}
-	
+
 	// Generate a clean hostname
 	hostname := GenerateHostname(config.Hostname)
-	
+
 	// Create the server request
 	createReq := &request.CreateServerRequest{
 		Zone:             config.Zone,
@@ -108,7 +108,7 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 		Hostname:         hostname,
 		Plan:             plan,
 		PasswordDelivery: request.PasswordDeliveryNone,
-		
+
 		// Configure storage
 		StorageDevices: []request.CreateServerStorageDevice{
 			{
@@ -119,7 +119,7 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 				Tier:    GetStorageTier(),
 			},
 		},
-		
+
 		// Configure networking
 		Networking: &request.CreateServerNetworking{
 			Interfaces: []request.CreateServerInterface{
@@ -142,7 +142,7 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 			},
 		},
 	}
-	
+
 	// Add SSH key if provided
 	if config.SSHKey != "" {
 		createReq.LoginUser = &request.LoginUser{
@@ -151,24 +151,24 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 			SSHKeys:        []string{config.SSHKey},
 		}
 	}
-	
+
 	// Add user data (cloud-init) if provided
 	if config.UserData != "" {
 		createReq.UserData = config.UserData
 	}
-	
+
 	// Create the server
 	serverDetails, err := c.service.CreateServer(ctx, createReq)
 	if err != nil {
 		return WrapError(err, "server creation")
 	}
-	
+
 	// Wait for server to start
 	waitReq := &request.WaitForServerStateRequest{
 		UUID:         serverDetails.UUID,
 		DesiredState: upcloud.ServerStateStarted,
 	}
-	
+
 	_, err = c.service.WaitForServerState(ctx, waitReq)
 	if err != nil {
 		// If waiting fails, try to clean up by deleting the server
@@ -177,7 +177,7 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 		})
 		return WrapError(err, "waiting for server to start")
 	}
-	
+
 	return nil
 }
 
@@ -192,18 +192,18 @@ func (c *Client) Delete(ctx context.Context, serverID string) error {
 		}
 		return err
 	}
-	
+
 	// Stop the server first if it's running
 	if server.State == upcloud.ServerStateStarted {
 		stopReq := &request.StopServerRequest{
-			UUID: server.UUID,
+			UUID:     server.UUID,
 			StopType: request.ServerStopTypeHard,
 		}
 		_, err = c.service.StopServer(ctx, stopReq)
 		if err != nil && !IsNotFoundError(err) {
 			return WrapError(err, "stopping server before deletion")
 		}
-		
+
 		// Wait for server to stop
 		waitReq := &request.WaitForServerStateRequest{
 			UUID:         server.UUID,
@@ -211,7 +211,7 @@ func (c *Client) Delete(ctx context.Context, serverID string) error {
 		}
 		_, _ = c.service.WaitForServerState(ctx, waitReq)
 	}
-	
+
 	// Delete the server
 	deleteReq := &request.DeleteServerRequest{
 		UUID: server.UUID,
@@ -220,7 +220,7 @@ func (c *Client) Delete(ctx context.Context, serverID string) error {
 	if err != nil && !IsNotFoundError(err) {
 		return WrapError(err, "server deletion")
 	}
-	
+
 	return nil
 }
 
@@ -231,12 +231,12 @@ func (c *Client) Start(ctx context.Context, serverID string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// Check if already started
 	if server.State == upcloud.ServerStateStarted {
 		return nil
 	}
-	
+
 	// Start the server
 	startReq := &request.StartServerRequest{
 		UUID: server.UUID,
@@ -245,7 +245,7 @@ func (c *Client) Start(ctx context.Context, serverID string) error {
 	if err != nil {
 		return WrapError(err, "server start")
 	}
-	
+
 	// Wait for server to start
 	waitReq := &request.WaitForServerStateRequest{
 		UUID:         server.UUID,
@@ -255,7 +255,7 @@ func (c *Client) Start(ctx context.Context, serverID string) error {
 	if err != nil {
 		return WrapError(err, "waiting for server to start")
 	}
-	
+
 	return nil
 }
 
@@ -266,22 +266,22 @@ func (c *Client) Stop(ctx context.Context, serverID string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// Check if already stopped
 	if server.State == upcloud.ServerStateStopped {
 		return nil
 	}
-	
+
 	// Stop the server
 	stopReq := &request.StopServerRequest{
-		UUID: server.UUID,
+		UUID:     server.UUID,
 		StopType: request.ServerStopTypeSoft,
 	}
 	_, err = c.service.StopServer(ctx, stopReq)
 	if err != nil {
 		return WrapError(err, "server stop")
 	}
-	
+
 	// Wait for server to stop
 	waitReq := &request.WaitForServerStateRequest{
 		UUID:         server.UUID,
@@ -291,7 +291,7 @@ func (c *Client) Stop(ctx context.Context, serverID string) error {
 	if err != nil {
 		return WrapError(err, "waiting for server to stop")
 	}
-	
+
 	return nil
 }
 
@@ -305,7 +305,7 @@ func (c *Client) Status(ctx context.Context, serverID string) (string, error) {
 		}
 		return StatusNotFound, err
 	}
-	
+
 	// Map UpCloud state to DevPod status
 	return MapServerStateToStatus(server.State), nil
 }
@@ -317,7 +317,7 @@ func (c *Client) GetServerIP(ctx context.Context, serverID string) (string, erro
 	if err != nil {
 		return "", err
 	}
-	
+
 	// Get full server details
 	serverDetails, err := c.service.GetServerDetails(ctx, &request.GetServerDetailsRequest{
 		UUID: server.UUID,
@@ -325,13 +325,13 @@ func (c *Client) GetServerIP(ctx context.Context, serverID string) (string, erro
 	if err != nil {
 		return "", WrapError(err, "getting server details")
 	}
-	
+
 	// Extract public IPv4 address
 	ip, err := GetPublicIPv4(serverDetails)
 	if err != nil {
 		return "", WrapError(err, "extracting public IP")
 	}
-	
+
 	return ip, nil
 }
 
@@ -342,7 +342,7 @@ func (c *Client) findServerByMachineID(ctx context.Context, machineID string) (*
 	if err != nil {
 		return nil, WrapError(err, "listing servers")
 	}
-	
+
 	// Find server by machine ID
 	server := FindServerByMachineID(servers.Servers, machineID)
 	if server == nil {
@@ -351,6 +351,6 @@ func (c *Client) findServerByMachineID(ctx context.Context, machineID string) (*
 			Message: fmt.Sprintf("Server with machine ID %s not found", machineID),
 		}
 	}
-	
+
 	return server, nil
 }

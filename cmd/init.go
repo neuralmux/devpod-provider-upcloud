@@ -38,14 +38,14 @@ func (cmd *InitCmd) Run(ctx context.Context, options *options.Options, log log.L
 	if options.Username == "" || options.Password == "" {
 		return fmt.Errorf("UPCLOUD_USERNAME and UPCLOUD_PASSWORD must be set")
 	}
-	
+
 	// Test API connection
 	client := upcloud.NewUpCloud(options.Username, options.Password)
 	err := client.TestConnection(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect to UpCloud API: %w", err)
 	}
-	
+
 	log.Infof("Successfully initialized UpCloud provider")
 	return nil
 }

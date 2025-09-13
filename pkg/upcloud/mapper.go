@@ -69,7 +69,7 @@ func ValidateZone(zone string) error {
 		"us-nyc1", "us-chi1", "us-sjo1", "sg-sin1", "au-syd1",
 		"es-mad1", "pl-waw1", "se-sto1",
 	}
-	
+
 	for _, validZone := range validZones {
 		if zone == validZone {
 			return nil
@@ -99,7 +99,7 @@ func FindServerByMachineID(servers []upcloud.Server, machineID string) *upcloud.
 			return &server
 		}
 	}
-	
+
 	// Try without "devpod-" prefix
 	hostname := GenerateHostname(machineID)
 	for _, server := range servers {
@@ -107,7 +107,7 @@ func FindServerByMachineID(servers []upcloud.Server, machineID string) *upcloud.
 			return &server
 		}
 	}
-	
+
 	return nil
 }
 

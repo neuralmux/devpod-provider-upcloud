@@ -34,13 +34,13 @@ func NewStopCmd() *cobra.Command {
 // Run runs the command logic
 func (cmd *StopCmd) Run(ctx context.Context, options *options.Options, log log.Logger) error {
 	client := upcloud.NewUpCloud(options.Username, options.Password)
-	
+
 	log.Infof("Stopping server %s...", options.MachineID)
 	err := client.Stop(ctx, options.MachineID)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Infof("Successfully stopped server %s", options.MachineID)
 	return nil
 }

@@ -52,7 +52,7 @@ func WrapError(err error, operation string) error {
 
 	// Check for common error patterns
 	errStr := err.Error()
-	
+
 	if strings.Contains(errStr, "401") || strings.Contains(errStr, "unauthorized") {
 		return &ProviderError{
 			Type:    ErrorTypeAuthentication,

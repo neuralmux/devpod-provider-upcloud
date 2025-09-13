@@ -1,0 +1,58 @@
+# Build artifacts
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*.test
+*.out
+coverage.html
+test-results/
+
+# Development files
+.devpod/
+tmp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Documentation (except README)
+docs/
+*.md
+!README.md
+
+# Environment files
+.env
+.env.local
+*.env
+
+# Node modules (if any)
+node_modules/
+
+# Logs
+*.log
+
+# Test scripts
+test-*.sh

@@ -1,3 +1,5 @@
+//go:build integration
+
 package main
 
 import (
@@ -21,7 +23,7 @@ func TestFeatures(t *testing.T) {
 
 	status := godog.TestSuite{
 		Name:                 "UpCloud Provider",
-		ScenarioInitializer: step_definitions.InitializeScenario,
+		ScenarioInitializer:  step_definitions.InitializeScenario,
 		TestSuiteInitializer: step_definitions.InitializeTestSuite,
 		Options:              &opts,
 	}.Run()
