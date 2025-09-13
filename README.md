@@ -2,7 +2,9 @@
 
 [![DevPod](https://img.shields.io/badge/DevPod-Provider-blue)](https://devpod.sh)
 [![UpCloud](https://img.shields.io/badge/UpCloud-Compatible-purple)](https://upcloud.com)
-[![Go](https://img.shields.io/badge/Go-1.19+-00ADD8?logo=go)](https://golang.org)
+[![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://golang.org)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?logo=github-actions)](https://github.com/neuralmux/devpod-provider-upcloud/actions)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 The official UpCloud provider for [DevPod](https://github.com/loft-sh/devpod) enables developers to create cloud development environments on [UpCloud](https://upcloud.com) infrastructure.
 
@@ -56,7 +58,7 @@ Behind the scenes, the UpCloud DevPod provider communicates with UpCloud API to 
 
 Open DevPod app on your computer, then go to "Providers" tab, then click on "Add Provider" button. Then in "Confgiure Provider" popup click on "+" button to add a custom provider.
 
-Enter "github.com/alexandrevilain/devpod-provider-ovhcloud" or "alexandrevilain/devpod-provider-ovhcloud" as source and fill all the needed information:
+Enter "github.com/neuralmux/devpod-provider-upcloud" or "neuralmux/devpod-provider-upcloud" as source and fill all the needed information:
 
 ![Screencast demo](./assets/desktop-demo.gif)
 
@@ -103,55 +105,153 @@ Enter "github.com/alexandrevilain/devpod-provider-ovhcloud" or "alexandrevilain/
 
 ## Development
 
-### Building from Source
+### Prerequisites
+
+- Go 1.21 or higher
+- Make
+- Git
+- (Optional) golangci-lint for code quality
+- (Optional) goreleaser for release builds
+
+### Quick Start
 
 ```bash
 # Clone the repository
 git clone https://github.com/neuralmux/devpod-provider-upcloud.git
 cd devpod-provider-upcloud
 
-# Install dependencies
-make deps
+# Run development setup
+./scripts/dev-setup.sh
 
 # Build the provider
 make build
 
-# Run tests
+# Run all tests
 make test-all
 ```
 
-### Testing Locally
+### Development Workflow
 
 ```bash
-# Set credentials
+# Before pushing changes
+make pre-push
+
+# Format code
+make fmt
+
+# Run linting
+make lint
+
+# Generate test coverage
+make coverage
+```
+
+### Testing
+
+#### Unit Tests
+```bash
+make test
+```
+
+#### BDD Tests (Godog)
+```bash
+make bdd
+```
+
+#### Local Testing with Mock Mode
+```bash
+# Test without real API calls
+./test-local.sh
+
+# Or manually with mock credentials
+export UPCLOUD_USERNAME="test"
+export UPCLOUD_PASSWORD="test"
+./bin/devpod-provider-upcloud init
+```
+
+#### Testing with Real Credentials
+```bash
+# Set real credentials
 export UPCLOUD_USERNAME="your-username"
 export UPCLOUD_PASSWORD="your-password"
 
-# Test provider initialization
-./bin/devpod-provider-upcloud init
-
-# Install locally
-make install
+# Test provider
+./test-provider.sh
 ```
 
 ## Architecture
 
-This provider uses the official [UpCloud Go SDK v8](https://github.com/UpCloudLtd/upcloud-go-api) to interact with the UpCloud API. It implements:
+This provider uses the official [UpCloud Go SDK v8](https://github.com/UpCloudLtd/upcloud-go-api) to interact with the UpCloud API.
 
-- **Server Management**: Full lifecycle control (create, start, stop, delete)
+### Key Components
+
+- **CLI Framework**: Cobra-based command structure
+- **API Client**: Full UpCloud API integration with mock mode support
+- **Server Management**: Complete lifecycle control (create, start, stop, delete, status)
 - **SSH Integration**: Automatic SSH key injection and secure connectivity
-- **Error Handling**: Comprehensive error messages and retry logic
-- **State Management**: Proper state tracking and transitions
+- **Error Handling**: User-friendly error messages with recovery suggestions
+- **Cloud-init**: Automatic DevPod agent installation and configuration
 
-## Contributions
+### Project Structure
+
+```
+├── cmd/                    # CLI commands (Cobra-based)
+│   ├── root.go            # Root command setup
+│   ├── init.go            # Provider initialization
+│   ├── create.go          # Server creation
+│   ├── delete.go          # Server deletion
+│   ├── start.go           # Server start
+│   ├── stop.go            # Server stop
+│   ├── status.go          # Server status
+│   └── command.go         # Command execution
+├── pkg/                   
+│   ├── upcloud/           # UpCloud API client
+│   │   ├── client.go      # Main client implementation
+│   │   ├── constants.go   # UpCloud-specific constants
+│   │   ├── mapper.go      # Resource mapping utilities
+│   │   └── errors.go      # Error handling
+│   └── options/           # Configuration management
+│       └── options.go     # Environment variable parsing
+├── features/              # BDD test specifications
+├── scripts/               # Development and CI/CD scripts
+├── .github/workflows/     # GitHub Actions CI/CD
+└── provider.yaml          # DevPod provider manifest
+```
+
+## CI/CD Pipeline
+
+The project includes a comprehensive CI/CD pipeline with:
+
+- **Automated Testing**: Unit, BDD, and integration tests
+- **Security Scanning**: CodeQL, Gosec, Trivy vulnerability scanning
+- **Quality Checks**: golangci-lint with multiple linters
+- **Multi-platform Builds**: Linux, macOS, Windows (amd64/arm64)
+- **Automated Releases**: Tag-based releases with GoReleaser
+- **Docker Images**: Multi-arch container builds
+- **Dependency Management**: Automated updates with Dependabot
+
+See [CI_CD_GUIDE.md](CI_CD_GUIDE.md) for detailed pipeline documentation.
+
+## Contributing
 
 Contributions are welcome! Please:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Set up development environment (`./scripts/dev-setup.sh`)
+4. Make your changes
+5. Run pre-push validation (`make pre-push`)
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
+
+### Development Guidelines
+
+- Follow Go best practices and idioms
+- Add tests for new functionality
+- Update documentation as needed
+- Ensure all CI checks pass
+- Use conventional commit messages
 
 ## License
 
