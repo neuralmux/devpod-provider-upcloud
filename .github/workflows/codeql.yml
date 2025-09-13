@@ -19,9 +19,9 @@ jobs:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 360
-    # Only run on public repositories or if Advanced Security is enabled
-    # For private repos without Advanced Security, this workflow will be skipped
-    if: github.repository == 'neuralmux/devpod-provider-upcloud' || github.event.repository.visibility == 'public'
+    # Only run on public repositories
+    # For private repos, this requires GitHub Advanced Security which is a paid feature
+    if: github.event.repository.visibility == 'public'
     
     strategy:
       fail-fast: false

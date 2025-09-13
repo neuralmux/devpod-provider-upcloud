@@ -61,13 +61,13 @@ jobs:
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
-        if: github.event.repository.visibility == 'public' || contains(github.event.repository.topics, 'advanced-security')
+        if: github.event.repository.visibility == 'public'
         continue-on-error: true
         with:
           sarif_file: gosec.sarif
       
-      - name: Upload Gosec results as artifact (if SARIF upload fails)
-        if: failure() || github.event.repository.visibility != 'public'
+      - name: Upload Gosec results as artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gosec-results
@@ -90,13 +90,13 @@ jobs:
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
-        if: github.event.repository.visibility == 'public' || contains(github.event.repository.topics, 'advanced-security')
+        if: github.event.repository.visibility == 'public'
         continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
       
-      - name: Upload Trivy results as artifact (if SARIF upload fails)
-        if: failure() || github.event.repository.visibility != 'public'
+      - name: Upload Trivy results as artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-results
@@ -136,6 +136,15 @@ jobs:
 
       - name: Upload SARIF results
         uses: github/codeql-action/upload-sarif@v3
+        if: github.event.repository.visibility == 'public'
+        continue-on-error: true
         with:
           sarif_file: reports/dependency-check-report.sarif
+      
+      - name: Upload OWASP results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-dependency-check-results
+          path: reports/
 

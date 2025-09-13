@@ -87,7 +87,15 @@ jobs:
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: github.event.repository.visibility == 'public'
+        continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-trivy-results
+          path: trivy-results.sarif
 
