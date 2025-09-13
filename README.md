@@ -2,7 +2,7 @@
 
 [![DevPod](https://img.shields.io/badge/DevPod-Provider-blue)](https://devpod.sh)
 [![UpCloud](https://img.shields.io/badge/UpCloud-Compatible-purple)](https://upcloud.com)
-[![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://golang.org)
+[![Go](https://img.shields.io/badge/Go-1.25+-00ADD8?logo=go)](https://golang.org)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?logo=github-actions)](https://github.com/neuralmux/devpod-provider-upcloud/actions)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
@@ -107,7 +107,7 @@ Enter "github.com/neuralmux/devpod-provider-upcloud" or "neuralmux/devpod-provid
 
 ### Prerequisites
 
-- Go 1.21 or higher
+- Go 1.25 or higher
 - Make
 - Git
 - (Optional) golangci-lint for code quality

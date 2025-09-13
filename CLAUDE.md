@@ -243,7 +243,7 @@ Servers are tagged with `devpod-machine={MACHINE_ID}` for identification across 
 - Real API testing requires valid UpCloud credentials
 
 ### Build Issues
-- Requires Go 1.21 or higher
+- Requires Go 1.25 or higher
 - Run `make deps` to ensure all dependencies are installed
 - Use `make pre-push` to validate before committing
 

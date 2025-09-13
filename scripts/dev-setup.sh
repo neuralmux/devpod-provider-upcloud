@@ -41,7 +41,7 @@ cd "$ROOT_DIR"
 # 1. Check Go installation
 log_info "Checking Go installation..."
 if ! command_exists go; then
-    log_error "Go is not installed. Please install Go 1.21+ from https://golang.org/"
+    log_error "Go is not installed. Please install Go 1.25+ from https://golang.org/"
     exit 1
 fi
 
@@ -49,8 +49,8 @@ GO_VERSION=$(go version | grep -o 'go[0-9]\+\.[0-9]\+' | head -1)
 GO_MAJOR=$(echo "$GO_VERSION" | cut -d. -f1 | sed 's/go//')
 GO_MINOR=$(echo "$GO_VERSION" | cut -d. -f2)
 
-if [ "$GO_MAJOR" -lt 1 ] || ([ "$GO_MAJOR" -eq 1 ] && [ "$GO_MINOR" -lt 21 ]); then
-    log_error "Go 1.21+ is required. Current version: $GO_VERSION"
+if [ "$GO_MAJOR" -lt 1 ] || ([ "$GO_MAJOR" -eq 1 ] && [ "$GO_MINOR" -lt 25 ]); then
+    log_error "Go 1.25+ is required. Current version: $GO_VERSION"
     exit 1
 fi
 

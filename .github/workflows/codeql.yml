@@ -56,7 +56,7 @@ jobs:
         if: matrix.language == 'go'
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.25'
 
       - name: Autobuild
         if: steps.check-advanced-security.outputs.advanced_security_available == 'true' || github.event.repository.visibility == 'public'
