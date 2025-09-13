@@ -19,9 +19,9 @@ jobs:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 360
-    # Only run on public repositories
-    # For private repos, this requires GitHub Advanced Security which is a paid feature
-    if: github.event.repository.visibility == 'public'
+    # Disabled for private repositories - requires GitHub Advanced Security (paid feature)
+    # To enable: make repository public or upgrade to GitHub Enterprise
+    if: false
     
     strategy:
       fail-fast: false

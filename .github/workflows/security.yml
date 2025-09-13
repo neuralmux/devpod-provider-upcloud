@@ -17,6 +17,8 @@ jobs:
   codeql:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
+    # Disabled for private repositories - requires GitHub Advanced Security
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -45,6 +47,8 @@ jobs:
   gosec:
     name: Gosec Security Scan
     runs-on: ubuntu-latest
+    # Disabled for private repositories - requires GitHub Advanced Security for SARIF upload
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -76,6 +80,8 @@ jobs:
   trivy:
     name: Trivy Security Scan
     runs-on: ubuntu-latest
+    # Disabled for private repositories - requires GitHub Advanced Security for SARIF upload
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -105,6 +111,8 @@ jobs:
   nancy:
     name: Nancy Vulnerability Scan
     runs-on: ubuntu-latest
+    # Disabled for private repositories - requires GitHub Advanced Security for SARIF upload
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -122,6 +130,8 @@ jobs:
   dependency-check:
     name: OWASP Dependency Check
     runs-on: ubuntu-latest
+    # Disabled for private repositories - requires GitHub Advanced Security for SARIF upload
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
