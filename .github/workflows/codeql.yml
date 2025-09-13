@@ -12,6 +12,7 @@ permissions:
   actions: read
   contents: read
   security-events: write
+  id-token: write  # This may be needed for OIDC
 
 jobs:
   analyze:
@@ -31,6 +32,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Go
+        if: matrix.language == 'go'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
       - name: Check if Advanced Security is available
         id: check-advanced-security
         run: |
@@ -45,6 +52,7 @@ jobs:
           fi
 
       - name: Initialize CodeQL
+        id: init-codeql
         if: steps.check-advanced-security.outputs.advanced_security_available == 'true' || github.event.repository.visibility == 'public'
         uses: github/codeql-action/init@v3
         with:
@@ -52,22 +60,25 @@ jobs:
           config-file: ./.github/codeql/codeql-config.yml
         continue-on-error: true
 
-      - name: Set up Go
-        if: matrix.language == 'go'
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25'
-
       - name: Autobuild
-        if: steps.check-advanced-security.outputs.advanced_security_available == 'true' || github.event.repository.visibility == 'public'
+        if: steps.init-codeql.outcome == 'success' && (steps.check-advanced-security.outputs.advanced_security_available == 'true' || github.event.repository.visibility == 'public')
         uses: github/codeql-action/autobuild@v3
         continue-on-error: true
 
       - name: Perform CodeQL Analysis
-        if: steps.check-advanced-security.outputs.advanced_security_available == 'true' || github.event.repository.visibility == 'public'
+        if: steps.init-codeql.outcome == 'success' && (steps.check-advanced-security.outputs.advanced_security_available == 'true' || github.event.repository.visibility == 'public')
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{matrix.language}}"
+          upload: false  # Disable upload if there are permission issues
+        continue-on-error: true
+      
+      - name: Upload SARIF manually
+        if: steps.init-codeql.outcome == 'success' && (steps.check-advanced-security.outputs.advanced_security_available == 'true' || github.event.repository.visibility == 'public')
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ../results
+          wait-for-processing: false
         continue-on-error: true
 
       - name: Alternative Security Check (when CodeQL not available)
