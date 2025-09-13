@@ -96,19 +96,24 @@ make bdd
 - ✅ Cobra-based CLI structure matching official providers
 - ✅ Environment variable parsing for options
 - ✅ Provider manifest (provider.yaml) with UpCloud configuration
-- ✅ Basic command implementations (init, create, delete, start, stop, status, command)
+- ✅ Full UpCloud API integration using official SDK v8
+- ✅ Server creation with SSH keys and cloud-init
+- ✅ Server lifecycle management (start, stop, delete)
+- ✅ IP address retrieval for SSH connectivity
+- ✅ Status checking with state mapping
+- ✅ Comprehensive error handling with user-friendly messages
 - ✅ SSH connectivity framework for command execution
 - ✅ Godog BDD testing framework setup
 
-### TODO - UpCloud API Integration
-The `pkg/upcloud/client.go` currently contains placeholder implementations. To complete the provider:
-
-1. **Add UpCloud Go SDK**: `go get github.com/UpCloudLtd/upcloud-go-api/v6`
-2. **Implement actual API calls** in `pkg/upcloud/client.go`:
-   - Server creation with SSH keys
-   - Server lifecycle management  
-   - IP address retrieval
-   - Status checking
+### API Integration Details
+The provider now uses the official UpCloud Go SDK v8 with:
+- Authentication via username/password
+- Server creation with customizable plans, zones, and storage
+- SSH key injection during server provisioning
+- Public IPv4 address assignment
+- Cloud-init user data support
+- Automatic cleanup on creation failure
+- Proper state waiting for all operations
 
 ## Provider Options
 
