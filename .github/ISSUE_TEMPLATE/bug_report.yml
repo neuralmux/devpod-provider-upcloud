@@ -50,7 +50,7 @@ body:
         - DevPod version: [e.g. 0.4.0]
         - Provider version: [e.g. 0.1.0]
         - UpCloud zone: [e.g. de-fra1]
-        - Go version (if building from source): [e.g. 1.21]
+        - Go version (if building from source): [e.g. 1.25]
     validations:
       required: true
 

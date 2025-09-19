@@ -79,7 +79,7 @@ The UpCloud DevPod Provider uses a fully automated release pipeline that:
 
 ### For Local Testing
 
-- Go 1.21 or higher
+- Go 1.25 or higher
 - GoReleaser (`brew install goreleaser` or download from [goreleaser.com](https://goreleaser.com))
 - Make
 - Git with configured signing (optional but recommended)

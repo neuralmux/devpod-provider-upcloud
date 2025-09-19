@@ -97,10 +97,10 @@ fi
 GO_VERSION=$(go version | grep -o 'go[0-9]\+\.[0-9]\+' | head -1)
 log_info "Go version: $GO_VERSION"
 
-# Check if we have the required Go version (1.21+)
-REQUIRED_GO_VERSION="1.21"
+# Check if we have the required Go version (1.25+)
+REQUIRED_GO_VERSION="1.25"
 if [[ $(echo -e "$GO_VERSION\ngo$REQUIRED_GO_VERSION" | sort -V | head -n1) != "go$REQUIRED_GO_VERSION" ]]; then
-    log_warning "Go version $GO_VERSION may not match CI (requires 1.21+)"
+    log_warning "Go version $GO_VERSION may not match CI (requires 1.25+)"
     WARNED_CHECKS+=("Go Version")
 fi
 
