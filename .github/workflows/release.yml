@@ -131,24 +131,20 @@ jobs:
 
           cd ..
 
-          # Create updated provider.yaml with actual checksums
-          cp provider.yaml provider-release.yaml
-
-          # Update URLs and checksums in provider-release.yaml
-          sed -i "s|##VERSION##|$TAG|g" provider-release.yaml
-          sed -i "s|##CHECKSUM_LINUX_AMD64##|$LINUX_AMD64_SHA|g" provider-release.yaml
-          sed -i "s|##CHECKSUM_LINUX_ARM64##|$LINUX_ARM64_SHA|g" provider-release.yaml
-          sed -i "s|##CHECKSUM_DARWIN_AMD64##|$DARWIN_AMD64_SHA|g" provider-release.yaml
-          sed -i "s|##CHECKSUM_DARWIN_ARM64##|$DARWIN_ARM64_SHA|g" provider-release.yaml
-          sed -i "s|##CHECKSUM_WINDOWS_AMD64##|$WINDOWS_AMD64_SHA|g" provider-release.yaml
+          # Update URLs and checksums in provider.yaml directly
+          sed -i "s|##VERSION##|$TAG|g" provider.yaml
+          sed -i "s|##CHECKSUM_LINUX_AMD64##|$LINUX_AMD64_SHA|g" provider.yaml
+          sed -i "s|##CHECKSUM_LINUX_ARM64##|$LINUX_ARM64_SHA|g" provider.yaml
+          sed -i "s|##CHECKSUM_DARWIN_AMD64##|$DARWIN_AMD64_SHA|g" provider.yaml
+          sed -i "s|##CHECKSUM_DARWIN_ARM64##|$DARWIN_ARM64_SHA|g" provider.yaml
+          sed -i "s|##CHECKSUM_WINDOWS_AMD64##|$WINDOWS_AMD64_SHA|g" provider.yaml
 
           echo "Provider.yaml updated with checksums"
 
       - name: Upload provider.yaml to release
         uses: softprops/action-gh-release@v1
         with:
-          files: provider-release.yaml
-          name: provider.yaml
+          files: provider.yaml
           tag_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
