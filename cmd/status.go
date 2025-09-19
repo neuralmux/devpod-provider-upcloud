@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/loft-sh/devpod/pkg/log"
+	"github.com/loft-sh/log"
 	"github.com/neuralmux/devpod-provider-upcloud/pkg/options"
 	"github.com/neuralmux/devpod-provider-upcloud/pkg/upcloud"
 	"github.com/spf13/cobra"

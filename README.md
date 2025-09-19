@@ -287,6 +287,8 @@ This provider uses the official [UpCloud Go SDK v8](https://github.com/UpCloudLt
 ├── configs/               # Configuration files
 │   └── server-plans.yaml  # Master plan definitions
 ├── docs/                  # Documentation
+│   ├── CI-CD.md          # CI/CD pipeline documentation
+│   ├── RELEASES.md       # Release process guide
 │   ├── SERVER-PLANS.md    # User guide for server plans
 │   ├── TEMPLATES.md       # Technical templating docs
 │   ├── MIGRATION.md       # Migration guide
@@ -295,12 +297,62 @@ This provider uses the official [UpCloud Go SDK v8](https://github.com/UpCloudLt
 ├── features/              # BDD test specifications
 ├── scripts/               # Development and CI/CD scripts
 ├── .github/workflows/     # GitHub Actions CI/CD
+├── CONTRIBUTING.md        # Contribution guidelines
 └── provider.yaml          # DevPod provider manifest
+```
+
+## Development & Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+
+- Development setup
+- Code style and standards
+- Testing requirements
+- Pull request process
+
+### Quick Start for Contributors
+
+```bash
+# Clone and setup
+git clone https://github.com/neuralmux/devpod-provider-upcloud.git
+cd devpod-provider-upcloud
+./scripts/dev-setup.sh
+
+# Run tests and checks
+make pre-push
 ```
 
 ## CI/CD Pipeline
 
-The project includes a comprehensive CI/CD pipeline with:
+[![CI](https://github.com/neuralmux/devpod-provider-upcloud/actions/workflows/ci.yml/badge.svg)](https://github.com/neuralmux/devpod-provider-upcloud/actions/workflows/ci.yml)
+[![Release](https://github.com/neuralmux/devpod-provider-upcloud/actions/workflows/release.yml/badge.svg)](https://github.com/neuralmux/devpod-provider-upcloud/actions/workflows/release.yml)
+
+The project uses GitHub Actions for continuous integration and delivery:
+
+### Automated Workflows
+
+- **CI Pipeline**: Runs on every push and PR
+  - Linting with golangci-lint
+  - Unit and BDD test suites
+  - Multi-platform build verification
+  - Code coverage reporting
+
+- **Release Pipeline**: Triggered by version tags
+  - Automated binary builds for all platforms
+  - SHA256 checksum generation
+  - GitHub Release creation
+  - Provider manifest updates
+
+- **Docker Builds**: Container image publishing
+  - Multi-architecture support (amd64/arm64)
+  - Automatic tagging and pushing to GHCR
+
+### Documentation
+
+- [CI/CD Pipeline Guide](docs/CI-CD.md) - Detailed workflow documentation
+- [Release Process](docs/RELEASES.md) - How to create and manage releases
+
+### Quality Assurance
 
 - **Automated Testing**: Unit, BDD, and integration tests
 - **Security Scanning**: CodeQL, Gosec, Trivy vulnerability scanning

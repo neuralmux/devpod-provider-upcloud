@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 
-	"github.com/loft-sh/devpod/pkg/log"
 	"github.com/loft-sh/devpod/pkg/ssh"
+	"github.com/loft-sh/log"
 	"github.com/neuralmux/devpod-provider-upcloud/pkg/options"
 	"github.com/neuralmux/devpod-provider-upcloud/pkg/upcloud"
 	"github.com/pkg/errors"

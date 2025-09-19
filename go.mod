@@ -6,6 +6,7 @@ require (
 	github.com/UpCloudLtd/upcloud-go-api/v8 v8.27.0
 	github.com/cucumber/godog v0.15.1
 	github.com/loft-sh/devpod v0.7.0-alpha.34
+	github.com/loft-sh/log v0.0.0-20250409101748-50124f882858
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.10.1
 	golang.org/x/crypto v0.42.0
@@ -71,7 +72,6 @@ require (
 	github.com/loft-sh/agentapi/v4 v4.3.0-devpod.alpha.31 // indirect
 	github.com/loft-sh/api/v4 v4.3.0-devpod.alpha.31 // indirect
 	github.com/loft-sh/apiserver v0.0.0-20250206205835-422f1d472459 // indirect
-	github.com/loft-sh/log v0.0.0-20250409101748-50124f882858 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

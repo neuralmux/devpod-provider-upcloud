@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/loft-sh/devpod/pkg/log"
 	devpodssh "github.com/loft-sh/devpod/pkg/ssh"
+	"github.com/loft-sh/log"
 	"github.com/neuralmux/devpod-provider-upcloud/pkg/options"
 	"github.com/neuralmux/devpod-provider-upcloud/pkg/upcloud"
 	"github.com/pkg/errors"
@@ -71,5 +71,5 @@ func (cmd *CommandCmd) Run(ctx context.Context, options *options.Options, log lo
 	}()
 
 	// Run the command
-	return devpodssh.Run(ctx, sshClient, command, os.Stdin, os.Stdout, os.Stderr)
+	return devpodssh.Run(ctx, sshClient, command, os.Stdin, os.Stdout, os.Stderr, nil)
 }
