@@ -2,7 +2,7 @@ name: upcloud
 version: 0.1.0
 description: |-
   DevPod on UpCloud
-icon: https://upcloud.com/favicon.ico
+icon: https://github.com/neuralmux/devpod-provider-upcloud/blob/main/assets/cloudmark.png
 optionGroups:
   - options:
       - UPCLOUD_USERNAME
@@ -88,26 +88,26 @@ options:
     description: "Custom template UUID (optional). If set, overrides the UPCLOUD_IMAGE selection."
     required: false
     suggestions:
-      - "01000000-0000-4000-8000-000030240200"  # Ubuntu 24.04 LTS
+      - "01000000-0000-4000-8000-000030240200" # Ubuntu 24.04 LTS
 
   UPCLOUD_PLAN:
     description: "Server plan (run 'devpod-provider-upcloud plans' to list all available plans)"
     default: DEV-2xCPU-4GB
     suggestions:
       # Developer Plans (Recommended for DevPod - Best Value)
-      - DEV-1xCPU-1GB-10GB  # €3/month - Minimal dev
-      - DEV-1xCPU-2GB       # €8/month - Light dev
-      - DEV-2xCPU-4GB       # €18/month - Standard dev (DEFAULT)
-      - DEV-2xCPU-8GB       # €25/month - Professional dev
-      - DEV-2xCPU-16GB      # €35/month - Heavy dev
+      - DEV-1xCPU-1GB-10GB # €3/month - Minimal dev
+      - DEV-1xCPU-2GB # €8/month - Light dev
+      - DEV-2xCPU-4GB # €18/month - Standard dev (DEFAULT)
+      - DEV-2xCPU-8GB # €25/month - Professional dev
+      - DEV-2xCPU-16GB # €35/month - Heavy dev
       # Cloud Native Plans (Pay only when powered on)
-      - CN-1xCPU-1GB        # €4/month - Microservices
-      - CN-2xCPU-2GB        # €12/month - Small containers
-      - CN-2xCPU-4GB        # €16/month - Medium containers
+      - CN-1xCPU-1GB # €4/month - Microservices
+      - CN-2xCPU-2GB # €12/month - Small containers
+      - CN-2xCPU-4GB # €16/month - Medium containers
       # General Purpose (Legacy - Higher cost)
-      - 1xCPU-1GB           # €7/month - Basic
-      - 2xCPU-4GB           # €28/month - Medium
-      - 4xCPU-8GB           # €56/month - Large
+      - 1xCPU-1GB # €7/month - Basic
+      - 2xCPU-4GB # €28/month - Medium
+      - 4xCPU-8GB # €56/month - Large
 
   INACTIVITY_TIMEOUT:
     description: If defined, will automatically stop the VM after the inactivity period.
