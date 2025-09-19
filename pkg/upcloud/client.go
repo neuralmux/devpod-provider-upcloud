@@ -117,6 +117,7 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 		Hostname:         hostname,
 		Plan:             plan,
 		PasswordDelivery: request.PasswordDeliveryNone,
+		Metadata:         upcloud.True, // Required for cloud-init templates
 
 		// Configure storage
 		StorageDevices: []request.CreateServerStorageDevice{
