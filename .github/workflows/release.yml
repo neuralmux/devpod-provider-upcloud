@@ -80,6 +80,49 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare binary files for DevPod
+        run: |
+          # Copy binaries from GoReleaser subdirectories to root with correct naming
+          cd dist
+
+          # Linux AMD64
+          if [ -f "provider_linux_amd64_v1/devpod-provider-upcloud" ]; then
+            cp "provider_linux_amd64_v1/devpod-provider-upcloud" "devpod-provider-upcloud-linux-amd64"
+          fi
+
+          # Linux ARM64
+          if [ -f "provider_linux_arm64_v8.0/devpod-provider-upcloud" ]; then
+            cp "provider_linux_arm64_v8.0/devpod-provider-upcloud" "devpod-provider-upcloud-linux-arm64"
+          fi
+
+          # Darwin AMD64
+          if [ -f "provider_darwin_amd64_v1/devpod-provider-upcloud" ]; then
+            cp "provider_darwin_amd64_v1/devpod-provider-upcloud" "devpod-provider-upcloud-darwin-amd64"
+          fi
+
+          # Darwin ARM64
+          if [ -f "provider_darwin_arm64_v8.0/devpod-provider-upcloud" ]; then
+            cp "provider_darwin_arm64_v8.0/devpod-provider-upcloud" "devpod-provider-upcloud-darwin-arm64"
+          fi
+
+          # Windows AMD64
+          if [ -f "provider_windows_amd64_v1/devpod-provider-upcloud.exe" ]; then
+            cp "provider_windows_amd64_v1/devpod-provider-upcloud.exe" "devpod-provider-upcloud-windows-amd64.exe"
+          fi
+
+          cd ..
+
+          # Upload the individual binaries as release assets
+          gh release upload ${{ github.ref_name }} \
+            dist/devpod-provider-upcloud-linux-amd64 \
+            dist/devpod-provider-upcloud-linux-arm64 \
+            dist/devpod-provider-upcloud-darwin-amd64 \
+            dist/devpod-provider-upcloud-darwin-arm64 \
+            dist/devpod-provider-upcloud-windows-amd64.exe \
+            --clobber || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Calculate checksums and update provider.yaml
         run: |
           TAG=${GITHUB_REF#refs/tags/}
@@ -94,7 +137,7 @@ jobs:
             fi
           }
 
-          # Calculate checksums from the built binaries
+          # The binaries are now in dist/ with the format: devpod-provider-upcloud-<os>-<arch>[.exe]
           cd dist
 
           # Find and calculate checksums for each platform
@@ -105,28 +148,33 @@ jobs:
           WINDOWS_AMD64_SHA=""
 
           # Linux AMD64
-          if [ -f "devpod-provider-upcloud_linux_amd64_v1/devpod-provider-upcloud" ]; then
-            LINUX_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud_linux_amd64_v1/devpod-provider-upcloud")
+          if [ -f "devpod-provider-upcloud-linux-amd64" ]; then
+            LINUX_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud-linux-amd64")
+            echo "Linux AMD64 checksum: $LINUX_AMD64_SHA"
           fi
 
           # Linux ARM64
-          if [ -f "devpod-provider-upcloud_linux_arm64/devpod-provider-upcloud" ]; then
-            LINUX_ARM64_SHA=$(calc_sha256 "devpod-provider-upcloud_linux_arm64/devpod-provider-upcloud")
+          if [ -f "devpod-provider-upcloud-linux-arm64" ]; then
+            LINUX_ARM64_SHA=$(calc_sha256 "devpod-provider-upcloud-linux-arm64")
+            echo "Linux ARM64 checksum: $LINUX_ARM64_SHA"
           fi
 
           # Darwin AMD64
-          if [ -f "devpod-provider-upcloud_darwin_amd64_v1/devpod-provider-upcloud" ]; then
-            DARWIN_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud_darwin_amd64_v1/devpod-provider-upcloud")
+          if [ -f "devpod-provider-upcloud-darwin-amd64" ]; then
+            DARWIN_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud-darwin-amd64")
+            echo "Darwin AMD64 checksum: $DARWIN_AMD64_SHA"
           fi
 
           # Darwin ARM64
-          if [ -f "devpod-provider-upcloud_darwin_arm64/devpod-provider-upcloud" ]; then
-            DARWIN_ARM64_SHA=$(calc_sha256 "devpod-provider-upcloud_darwin_arm64/devpod-provider-upcloud")
+          if [ -f "devpod-provider-upcloud-darwin-arm64" ]; then
+            DARWIN_ARM64_SHA=$(calc_sha256 "devpod-provider-upcloud-darwin-arm64")
+            echo "Darwin ARM64 checksum: $DARWIN_ARM64_SHA"
           fi
 
           # Windows AMD64
-          if [ -f "devpod-provider-upcloud_windows_amd64_v1/devpod-provider-upcloud.exe" ]; then
-            WINDOWS_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud_windows_amd64_v1/devpod-provider-upcloud.exe")
+          if [ -f "devpod-provider-upcloud-windows-amd64.exe" ]; then
+            WINDOWS_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud-windows-amd64.exe")
+            echo "Windows AMD64 checksum: $WINDOWS_AMD64_SHA"
           fi
 
           cd ..

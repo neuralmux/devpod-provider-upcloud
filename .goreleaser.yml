@@ -50,9 +50,7 @@ archives:
         formats:
           - zip
     files:
-      - README.md
-      - LICENSE
-      - provider.yaml
+      - none*
 
 checksum:
   name_template: "checksums.txt"
