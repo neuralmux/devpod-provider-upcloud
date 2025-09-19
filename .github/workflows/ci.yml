@@ -114,7 +114,7 @@ jobs:
           path: bin/devpod-provider-upcloud
 
   # security:
-  #   name: Security Scan  
+  #   name: Security Scan
   #   # Disabled for private repositories - use dedicated security.yml workflow instead
   #   # (which is also currently disabled due to GitHub Advanced Security requirements)
 
@@ -143,10 +143,15 @@ jobs:
 
       # Optional: Test with real UpCloud credentials if secrets are set
       - name: Test with real credentials
-        if: ${{ secrets.UPCLOUD_USERNAME && secrets.UPCLOUD_PASSWORD }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        env:
+          UPCLOUD_USERNAME: ${{ secrets.UPCLOUD_USERNAME }}
+          UPCLOUD_PASSWORD: ${{ secrets.UPCLOUD_PASSWORD }}
         run: |
-          export UPCLOUD_USERNAME="${{ secrets.UPCLOUD_USERNAME }}"
-          export UPCLOUD_PASSWORD="${{ secrets.UPCLOUD_PASSWORD }}"
-          ./bin/devpod-provider-upcloud init
+          if [ -n "$UPCLOUD_USERNAME" ] && [ -n "$UPCLOUD_PASSWORD" ]; then
+            echo "Testing with real credentials..."
+            ./bin/devpod-provider-upcloud init
+          else
+            echo "Skipping real credential test - secrets not configured"
+          fi
         continue-on-error: true
-

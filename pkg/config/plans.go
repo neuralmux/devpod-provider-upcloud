@@ -14,12 +14,12 @@ var serverPlansYAML []byte
 
 // ServerPlans represents the complete server plans configuration
 type ServerPlans struct {
-	Version        string                     `yaml:"version"`
-	LastUpdated    string                     `yaml:"last_updated"`
-	DefaultPlan    string                     `yaml:"default_plan"`
-	Categories     map[string]*PlanCategory  `yaml:"categories"`
-	SelectionRules SelectionRules            `yaml:"selection_rules"`
-	Metadata       PlanMetadata              `yaml:"metadata"`
+	Version        string                   `yaml:"version"`
+	LastUpdated    string                   `yaml:"last_updated"`
+	DefaultPlan    string                   `yaml:"default_plan"`
+	Categories     map[string]*PlanCategory `yaml:"categories"`
+	SelectionRules SelectionRules           `yaml:"selection_rules"`
+	Metadata       PlanMetadata             `yaml:"metadata"`
 }
 
 // PlanCategory represents a category of server plans
@@ -34,18 +34,18 @@ type PlanCategory struct {
 
 // ServerPlan represents an individual server plan
 type ServerPlan struct {
-	ID           string              `yaml:"id"`
-	DisplayName  string              `yaml:"display_name"`
-	Description  string              `yaml:"description"`
-	CPU          int                 `yaml:"cpu"`
-	RAM          int                 `yaml:"ram"`
-	Storage      int                 `yaml:"storage"`
-	PriceMonthly float32             `yaml:"price_monthly"`
-	PriceHourly  float32             `yaml:"price_hourly"`
-	UseCases     []string            `yaml:"use_cases"`
-	Default      bool                `yaml:"default"`
-	Recommended  bool                `yaml:"recommended"`
-	Restrictions *PlanRestrictions   `yaml:"restrictions,omitempty"`
+	ID           string            `yaml:"id"`
+	DisplayName  string            `yaml:"display_name"`
+	Description  string            `yaml:"description"`
+	CPU          int               `yaml:"cpu"`
+	RAM          int               `yaml:"ram"`
+	Storage      int               `yaml:"storage"`
+	PriceMonthly float32           `yaml:"price_monthly"`
+	PriceHourly  float32           `yaml:"price_hourly"`
+	UseCases     []string          `yaml:"use_cases"`
+	Default      bool              `yaml:"default"`
+	Recommended  bool              `yaml:"recommended"`
+	Restrictions *PlanRestrictions `yaml:"restrictions,omitempty"`
 }
 
 // PlanRestrictions represents any restrictions on a plan
@@ -55,8 +55,8 @@ type PlanRestrictions struct {
 
 // SelectionRules defines rules for plan selection
 type SelectionRules struct {
-	Minimum         MinimumRequirements        `yaml:"minimum"`
-	Recommendations PlanRecommendations        `yaml:"recommendations"`
+	Minimum         MinimumRequirements `yaml:"minimum"`
+	Recommendations PlanRecommendations `yaml:"recommendations"`
 }
 
 // MinimumRequirements defines minimum specs for DevPod
@@ -68,10 +68,10 @@ type MinimumRequirements struct {
 
 // PlanRecommendations contains recommended plans for different scenarios
 type PlanRecommendations struct {
-	Default      string            `yaml:"default"`
-	ByLanguage   map[string]string `yaml:"by_language"`
-	ByFramework  map[string]string `yaml:"by_framework"`
-	ByWorkload   map[string]string `yaml:"by_workload"`
+	Default     string            `yaml:"default"`
+	ByLanguage  map[string]string `yaml:"by_language"`
+	ByFramework map[string]string `yaml:"by_framework"`
+	ByWorkload  map[string]string `yaml:"by_workload"`
 }
 
 // PlanMetadata contains metadata about the plans

@@ -139,6 +139,7 @@ func TestGetDefaultPlan(t *testing.T) {
 
 	if defaultPlan == nil {
 		t.Error("Default plan should not be nil")
+		return
 	}
 
 	if defaultPlan.ID != plans.DefaultPlan {

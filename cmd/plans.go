@@ -256,7 +256,9 @@ func (cmd *PlansCmd) outputYAML(plans *config.ServerPlans) error {
 	// For YAML, we'll output the raw configuration
 	// This allows users to save and modify it if needed
 	encoder := yaml.NewEncoder(os.Stdout)
-	defer encoder.Close()
+	defer func() {
+		_ = encoder.Close()
+	}()
 
 	// Filter if needed
 	if cmd.Category != "" {
