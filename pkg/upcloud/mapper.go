@@ -72,9 +72,13 @@ func ParseStorageSize(storageStr string) (int, error) {
 	return size, nil
 }
 
-// GetStorageTier returns the appropriate storage tier
-func GetStorageTier() string {
-	// For DevPod workspaces, we want good performance
+// GetStorageTier returns the appropriate storage tier based on the plan
+func GetStorageTier(plan string) string {
+	// DEV and CN (Cloud Native) plans require standard storage tier
+	if strings.HasPrefix(plan, "DEV-") || strings.HasPrefix(plan, "CN-") {
+		return upcloud.StorageTierStandard
+	}
+	// Other plans (General Purpose, High CPU, High Memory) can use MaxIOPS
 	return upcloud.StorageTierMaxIOPS
 }
 

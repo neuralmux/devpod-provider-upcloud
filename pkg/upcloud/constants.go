@@ -28,9 +28,10 @@ const (
 
 // Default values
 const (
-	DefaultSSHUser     = "root"
-	DefaultStorageTier = "maxiops"
-	DefaultTimeout     = 300 // seconds
+	DefaultSSHUser             = "root"
+	DefaultStorageTier         = "maxiops"
+	DefaultStorageTierStandard = "standard"
+	DefaultTimeout             = 300 // seconds
 )
 
 // Plan mappings - Legacy mapping for backward compatibility

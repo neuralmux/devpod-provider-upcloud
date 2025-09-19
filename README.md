@@ -15,7 +15,7 @@ The official UpCloud provider for [DevPod](https://github.com/loft-sh/devpod) en
 - 📊 **Smart Plan Selection** - Built-in `plans` command helps choose the perfect server
 - 🔐 **SSH Key Authentication** - Secure access with automatic SSH key injection
 - 🌍 **Global Zones** - Deploy to 13+ data centers worldwide
-- 💾 **Flexible Storage** - Configurable SSD storage with MaxIOPS tier
+- 💾 **Flexible Storage** - Configurable SSD storage with automatic tier selection (Standard for DEV plans, MaxIOPS for production plans)
 - 🔄 **Full Lifecycle Management** - Create, start, stop, and delete servers
 - 🎯 **Auto-configuration** - Cloud-init support for automatic environment setup
 - ⏱️ **Auto-shutdown** - Save costs by stopping idle workspaces automatically

@@ -125,7 +125,7 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 				Storage: templateUUID,
 				Title:   "root",
 				Size:    storageSize,
-				Tier:    GetStorageTier(),
+				Tier:    GetStorageTier(plan),
 			},
 		},
 
