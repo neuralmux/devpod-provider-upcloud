@@ -120,9 +120,51 @@ setup_provider() {
         fi
     fi
 
-    # Add the provider
+    # Add the provider - check if release exists
     print_info "Adding UpCloud provider..."
-    devpod provider add "$PROVIDER_REPO" --name "$PROVIDER_NAME"
+
+    # Try to add from GitHub release first
+    if ! devpod provider add "$PROVIDER_REPO" --name "$PROVIDER_NAME" 2>/dev/null; then
+        print_warning "No official release found. Checking for local development setup..."
+
+        # Check if we're in the provider directory or can find it
+        if [ -f "provider.yaml" ] && [ -f "main.go" ]; then
+            print_info "Found local provider directory. Building and installing locally..."
+
+            # Build the provider
+            if check_command go; then
+                make build || go build -o bin/devpod-provider-upcloud
+
+                # Install locally
+                devpod provider add . --name "$PROVIDER_NAME"
+                print_success "Installed from local build!"
+            else
+                print_error "Go is not installed. Cannot build provider locally."
+                echo ""
+                echo "Options:"
+                echo "1. Install Go from https://go.dev and run this script again"
+                echo "2. Wait for an official release at $PROVIDER_REPO/releases"
+                echo "3. Build the provider on another machine and copy the binary"
+                exit 1
+            fi
+        else
+            print_error "Could not find provider source code or official release."
+            echo ""
+            echo "This appears to be a pre-release version. Options:"
+            echo ""
+            echo "1. Clone and build locally:"
+            echo "   git clone https://github.com/neuralmux/devpod-provider-upcloud.git"
+            echo "   cd devpod-provider-upcloud"
+            echo "   ./quickstart.sh"
+            echo ""
+            echo "2. Wait for the first official release at:"
+            echo "   https://github.com/neuralmux/devpod-provider-upcloud/releases"
+            echo ""
+            exit 1
+        fi
+    else
+        print_success "Provider added from GitHub release!"
+    fi
 
     # Set as default provider
     devpod provider use "$PROVIDER_NAME"
@@ -159,14 +201,21 @@ show_next_steps() {
     echo "  ${BLUE}View provider options:${NC}"
     echo "    devpod provider options upcloud"
     echo ""
+    echo "  ${BLUE}List available server plans:${NC}"
+    echo "    devpod-provider-upcloud plans --recommended"
+    echo ""
     echo "  ${BLUE}Change server size:${NC}"
-    echo "    devpod provider set-options upcloud --option UPCLOUD_PLAN=4xCPU-8GB"
+    echo "    devpod provider set-options upcloud --option UPCLOUD_PLAN=DEV-2xCPU-8GB"
     echo ""
     echo "  ${BLUE}Change deployment zone:${NC}"
     echo "    devpod provider set-options upcloud --option UPCLOUD_ZONE=us-nyc1"
     echo ""
     echo -e "${BOLD}Available Zones:${NC} de-fra1, fi-hel1, nl-ams1, uk-lon1, us-nyc1, us-chi1, sg-sin1, au-syd1"
-    echo -e "${BOLD}Available Plans:${NC} 1xCPU-1GB, 2xCPU-4GB, 4xCPU-8GB, 6xCPU-16GB, 8xCPU-32GB"
+    echo -e "${BOLD}Recommended Plans:${NC}"
+    echo "  • DEV-1xCPU-1GB-10GB (€3/mo) - Minimal development"
+    echo "  • DEV-2xCPU-4GB (€18/mo) - Standard development (default)"
+    echo "  • DEV-2xCPU-8GB (€25/mo) - Professional development"
+    echo "  • CN-2xCPU-4GB (€16/mo*) - Pay-per-use (*only when running)"
     echo ""
     echo -e "${GREEN}${BOLD}Happy coding! 🚀${NC}"
 }

@@ -39,13 +39,16 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
+      - name: Copy server plans for embedding
+        run: cp configs/server-plans.yaml pkg/config/
+
       - name: Run tests before release
         run: make test-all
         env:
           UPCLOUD_USERNAME: test
           UPCLOUD_PASSWORD: test
           UPCLOUD_ZONE: de-fra1
-          UPCLOUD_PLAN: 2xCPU-4GB
+          UPCLOUD_PLAN: DEV-2xCPU-4GB
           UPCLOUD_STORAGE: "50"
           UPCLOUD_IMAGE: "Ubuntu Server 22.04 LTS (Jammy Jellyfish)"
 
@@ -56,17 +59,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update provider.yaml version
+      - name: Prepare provider.yaml with version and placeholders
         run: |
           TAG=${GITHUB_REF#refs/tags/}
-          sed -i "s/version: .*/version: ${TAG#v}/" provider.yaml
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add provider.yaml
-          git commit -m "Update provider.yaml version to ${TAG#v}" || true
+          VERSION=${TAG#v}
+
+          # Update version in provider.yaml
+          sed -i "s/version: .*/version: $VERSION/" provider.yaml
+
+          # Ensure placeholders are in provider.yaml for checksums
+          # These will be replaced after GoReleaser builds the binaries
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
+        id: goreleaser
         with:
           distribution: goreleaser
           version: latest
@@ -74,40 +80,78 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update provider.yaml with release URLs and checksums
+      - name: Calculate checksums and update provider.yaml
         run: |
           TAG=${GITHUB_REF#refs/tags/}
           VERSION=${TAG#v}
 
-          # Download checksums
-          curl -s -L "https://github.com/neuralmux/devpod-provider-upcloud/releases/download/$TAG/checksums.txt" > checksums.txt
+          # Function to calculate SHA256
+          calc_sha256() {
+            if command -v sha256sum >/dev/null 2>&1; then
+              sha256sum "$1" | awk '{print $1}'
+            else
+              shasum -a 256 "$1" | awk '{print $1}'
+            fi
+          }
 
-          # Extract checksums
-          LINUX_AMD64_CHECKSUM=$(grep "devpod-provider-upcloud-linux-amd64" checksums.txt | cut -d' ' -f1)
-          LINUX_ARM64_CHECKSUM=$(grep "devpod-provider-upcloud-linux-arm64" checksums.txt | cut -d' ' -f1)
-          DARWIN_AMD64_CHECKSUM=$(grep "devpod-provider-upcloud-darwin-amd64" checksums.txt | cut -d' ' -f1)
-          DARWIN_ARM64_CHECKSUM=$(grep "devpod-provider-upcloud-darwin-arm64" checksums.txt | cut -d' ' -f1)
-          WINDOWS_AMD64_CHECKSUM=$(grep "devpod-provider-upcloud-windows-amd64.exe" checksums.txt | cut -d' ' -f1)
+          # Calculate checksums from the built binaries
+          cd dist
 
-          # Update provider.yaml with real URLs and checksums
-          sed -i "s/##VERSION##/$VERSION/g" provider.yaml
-          sed -i "s/##CHECKSUM_LINUX_AMD64##/$LINUX_AMD64_CHECKSUM/g" provider.yaml
-          sed -i "s/##CHECKSUM_LINUX_ARM64##/$LINUX_ARM64_CHECKSUM/g" provider.yaml
-          sed -i "s/##CHECKSUM_DARWIN_AMD64##/$DARWIN_AMD64_CHECKSUM/g" provider.yaml
-          sed -i "s/##CHECKSUM_DARWIN_ARM64##/$DARWIN_ARM64_CHECKSUM/g" provider.yaml
-          sed -i "s/##CHECKSUM_WINDOWS_AMD64##/$WINDOWS_AMD64_CHECKSUM/g" provider.yaml
-        continue-on-error: true
+          # Find and calculate checksums for each platform
+          LINUX_AMD64_SHA=""
+          LINUX_ARM64_SHA=""
+          DARWIN_AMD64_SHA=""
+          DARWIN_ARM64_SHA=""
+          WINDOWS_AMD64_SHA=""
 
-      - name: Upload updated provider.yaml as release asset
-        uses: actions/upload-release-asset@v1
+          # Linux AMD64
+          if [ -f "devpod-provider-upcloud_linux_amd64_v1/devpod-provider-upcloud" ]; then
+            LINUX_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud_linux_amd64_v1/devpod-provider-upcloud")
+          fi
+
+          # Linux ARM64
+          if [ -f "devpod-provider-upcloud_linux_arm64/devpod-provider-upcloud" ]; then
+            LINUX_ARM64_SHA=$(calc_sha256 "devpod-provider-upcloud_linux_arm64/devpod-provider-upcloud")
+          fi
+
+          # Darwin AMD64
+          if [ -f "devpod-provider-upcloud_darwin_amd64_v1/devpod-provider-upcloud" ]; then
+            DARWIN_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud_darwin_amd64_v1/devpod-provider-upcloud")
+          fi
+
+          # Darwin ARM64
+          if [ -f "devpod-provider-upcloud_darwin_arm64/devpod-provider-upcloud" ]; then
+            DARWIN_ARM64_SHA=$(calc_sha256 "devpod-provider-upcloud_darwin_arm64/devpod-provider-upcloud")
+          fi
+
+          # Windows AMD64
+          if [ -f "devpod-provider-upcloud_windows_amd64_v1/devpod-provider-upcloud.exe" ]; then
+            WINDOWS_AMD64_SHA=$(calc_sha256 "devpod-provider-upcloud_windows_amd64_v1/devpod-provider-upcloud.exe")
+          fi
+
+          cd ..
+
+          # Create updated provider.yaml with actual checksums
+          cp provider.yaml provider-release.yaml
+
+          # Update URLs and checksums in provider-release.yaml
+          sed -i "s|##VERSION##|$TAG|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_LINUX_AMD64##|$LINUX_AMD64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_LINUX_ARM64##|$LINUX_ARM64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_DARWIN_AMD64##|$DARWIN_AMD64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_DARWIN_ARM64##|$DARWIN_ARM64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_WINDOWS_AMD64##|$WINDOWS_AMD64_SHA|g" provider-release.yaml
+
+          echo "Provider.yaml updated with checksums"
+
+      - name: Upload provider.yaml to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: provider-release.yaml
+          name: provider.yaml
+          tag_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./provider.yaml
-          asset_name: provider.yaml
-          asset_content_type: application/x-yaml
-        continue-on-error: true
 
   notify:
     name: Notify
@@ -120,6 +164,8 @@ jobs:
         run: |
           echo "🎉 Release successful! New version is now available."
           echo "Users can install with: devpod provider add github.com/neuralmux/devpod-provider-upcloud@${GITHUB_REF#refs/tags/}"
+          echo "Or use the quick start script:"
+          echo "curl -fsSL https://raw.githubusercontent.com/neuralmux/devpod-provider-upcloud/main/quickstart.sh | bash"
 
       - name: Notify on failure
         if: needs.release.result == 'failure'
