@@ -13,6 +13,7 @@ type Options struct {
 	Plan     string
 	Storage  string
 	Image    string
+	Template string
 	Username string
 	Password string
 }
@@ -27,7 +28,8 @@ func FromEnv(skipMachine bool) (*Options, error) {
 			return nil, err
 		}
 		// prefix with devpod-
-		retOptions.MachineID = "devpod-" + retOptions.MachineID
+		// MachineID already includes "devpod-" prefix from DevPod
+		// No need to add it again
 
 		retOptions.MachineFolder, err = fromEnvOrError("MACHINE_FOLDER")
 		if err != nil {
@@ -59,6 +61,8 @@ func FromEnv(skipMachine bool) (*Options, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Template is optional, so use fromEnv instead of fromEnvOrError
+	retOptions.Template = os.Getenv("UPCLOUD_TEMPLATE")
 
 	return retOptions, nil
 }

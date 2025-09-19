@@ -25,6 +25,7 @@ type ServerConfig struct {
 	Plan     string
 	Storage  string
 	Image    string
+	Template string
 	SSHKey   string
 	UserData string
 }
@@ -95,10 +96,15 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 		return WrapError(err, "plan mapping")
 	}
 
-	// Map image to template UUID
-	templateUUID, err := MapImageToTemplate(config.Image)
-	if err != nil {
-		return WrapError(err, "image mapping")
+	// Use custom template if provided, otherwise map image to template UUID
+	var templateUUID string
+	if config.Template != "" {
+		templateUUID = config.Template
+	} else {
+		templateUUID, err = MapImageToTemplate(config.Image)
+		if err != nil {
+			return WrapError(err, "image mapping")
+		}
 	}
 
 	// Parse storage size

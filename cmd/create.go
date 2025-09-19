@@ -56,6 +56,7 @@ func (cmd *CreateCmd) Run(ctx context.Context, options *options.Options, log log
 		Plan:     options.Plan,
 		Storage:  options.Storage,
 		Image:    options.Image,
+		Template: options.Template,
 		SSHKey:   string(publicKey),
 		UserData: GetCloudInitScript(options.MachineID),
 	}

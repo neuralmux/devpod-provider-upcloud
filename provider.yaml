@@ -14,6 +14,7 @@ optionGroups:
       - UPCLOUD_PLAN
       - UPCLOUD_STORAGE
       - UPCLOUD_IMAGE
+      - UPCLOUD_TEMPLATE
     name: "Server Configuration"
     defaultVisible: true
   - options:
@@ -73,14 +74,21 @@ options:
 
   UPCLOUD_IMAGE:
     description: The operating system image to use.
-    default: Ubuntu Server 22.04 LTS (Jammy Jellyfish)
+    default: Ubuntu Server 24.04 LTS (Noble Numbat)
     suggestions:
+      - Ubuntu Server 24.04 LTS (Noble Numbat)
       - Ubuntu Server 22.04 LTS (Jammy Jellyfish)
       - Ubuntu Server 20.04 LTS (Focal Fossa)
-      - Debian 11 (Bullseye)
       - Debian 12 (Bookworm)
+      - Debian 11 (Bullseye)
       - Rocky Linux 9
       - AlmaLinux 9
+
+  UPCLOUD_TEMPLATE:
+    description: "Custom template UUID (optional). If set, overrides the UPCLOUD_IMAGE selection."
+    required: false
+    suggestions:
+      - "01000000-0000-4000-8000-000030240200"  # Ubuntu 24.04 LTS
 
   UPCLOUD_PLAN:
     description: "Server plan (run 'devpod-provider-upcloud plans' to list all available plans)"
