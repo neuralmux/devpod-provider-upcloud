@@ -19,6 +19,7 @@ vendor/
 bin/
 dist/
 build/
+release/
 
 # Go workspace file
 go.work
@@ -50,3 +51,4 @@ test-provider
 # Test artifacts
 test-results/
 *.log
+provider.yaml.tmp

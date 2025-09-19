@@ -1,3 +1,5 @@
+version: 2
+
 project_name: devpod-provider-upcloud
 
 before:
@@ -31,7 +33,8 @@ universal_binaries:
 
 archives:
   - id: provider
-    format: tar.gz
+    formats:
+      - tar.gz
     name_template: >-
       {{ .ProjectName }}_
       {{- .Version }}_
@@ -41,27 +44,28 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
     files:
       - README.md
       - LICENSE
       - provider.yaml
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
   use: github
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^ci:'
-      - '^chore:'
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
       - Merge pull request
       - Merge branch
   groups:
@@ -71,7 +75,7 @@ changelog:
     - title: "Bug Fixes"
       regexp: "^.*fix[(\\w)]*:+.*$"
       order: 1
-    - title: "Improvements" 
+    - title: "Improvements"
       regexp: "^.*enhance[(\\w)]*:+.*$"
       order: 2
     - title: "Other Changes"
@@ -94,12 +98,12 @@ release:
     ```bash
     # Add provider
     devpod provider add github.com/neuralmux/devpod-provider-upcloud@{{ .Tag }}
-    
+
     # Configure credentials
     devpod provider set-options upcloud \
       --option UPCLOUD_USERNAME=<your-username> \
       --option UPCLOUD_PASSWORD=<your-password>
-    
+
     # Use provider
     devpod provider use upcloud
     ```
@@ -114,31 +118,3 @@ release:
     - **Documentation**: [README.md](https://github.com/neuralmux/devpod-provider-upcloud#readme)  
     - **Issues**: [GitHub Issues](https://github.com/neuralmux/devpod-provider-upcloud/issues)
     - **DevPod Docs**: [devpod.sh/docs](https://devpod.sh/docs)
-
-# Homebrew tap (optional)
-brews:
-  - tap:
-      owner: neuralmux
-      name: homebrew-devpod
-    homepage: https://github.com/neuralmux/devpod-provider-upcloud
-    description: "UpCloud provider for DevPod"
-    license: MIT
-    test: |
-      system "#{bin}/devpod-provider-upcloud --help"
-    install: |
-      bin.install "devpod-provider-upcloud"
-      (etc/"devpod/providers").install "provider.yaml" => "upcloud.yaml"
-
-# Docker images (optional)
-dockers:
-  - image_templates:
-      - "ghcr.io/neuralmux/devpod-provider-upcloud:{{ .Version }}"
-      - "ghcr.io/neuralmux/devpod-provider-upcloud:latest"
-    dockerfile: Dockerfile
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--platform=linux/amd64"

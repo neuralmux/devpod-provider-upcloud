@@ -78,27 +78,56 @@ calc_sha256() {
 }
 
 # Expected binary paths from goreleaser
-declare -A BINARIES=(
-    ["linux_amd64"]="dist/devpod-provider-upcloud_linux_amd64_v1/devpod-provider-upcloud"
-    ["linux_arm64"]="dist/devpod-provider-upcloud_linux_arm64/devpod-provider-upcloud"
-    ["darwin_amd64"]="dist/devpod-provider-upcloud_darwin_amd64_v1/devpod-provider-upcloud"
-    ["darwin_arm64"]="dist/devpod-provider-upcloud_darwin_arm64/devpod-provider-upcloud"
-    ["windows_amd64"]="dist/devpod-provider-upcloud_windows_amd64_v1/devpod-provider-upcloud.exe"
-)
+# Using regular variables instead of associative arrays for Bash 3 compatibility
+# Note: GoReleaser uses the build ID "provider" so paths start with "provider_"
+BINARY_LINUX_AMD64="dist/provider_linux_amd64_v1/devpod-provider-upcloud"
+BINARY_LINUX_ARM64="dist/provider_linux_arm64_v8.0/devpod-provider-upcloud"
+BINARY_DARWIN_AMD64="dist/provider_darwin_amd64_v1/devpod-provider-upcloud"
+BINARY_DARWIN_ARM64="dist/provider_darwin_arm64_v8.0/devpod-provider-upcloud"
+BINARY_WINDOWS_AMD64="dist/provider_windows_amd64_v1/devpod-provider-upcloud.exe"
 
-# Store checksums
-declare -A CHECKSUMS
+# Store checksums in regular variables
+CHECKSUM_LINUX_AMD64=""
+CHECKSUM_LINUX_ARM64=""
+CHECKSUM_DARWIN_AMD64=""
+CHECKSUM_DARWIN_ARM64=""
+CHECKSUM_WINDOWS_AMD64=""
 
-for platform in "${!BINARIES[@]}"; do
-    binary="${BINARIES[$platform]}"
-    if [ -f "$binary" ]; then
-        checksum=$(calc_sha256 "$binary")
-        CHECKSUMS[$platform]=$checksum
-        echo -e "  ${GREEN}✓${NC} $platform: ${checksum:0:16}..."
-    else
-        echo -e "  ${RED}✗${NC} $platform: Binary not found at $binary"
-    fi
-done
+# Check and calculate checksums for each platform
+if [ -f "$BINARY_LINUX_AMD64" ]; then
+    CHECKSUM_LINUX_AMD64=$(calc_sha256 "$BINARY_LINUX_AMD64")
+    echo -e "  ${GREEN}✓${NC} linux_amd64: ${CHECKSUM_LINUX_AMD64:0:16}..."
+else
+    echo -e "  ${RED}✗${NC} linux_amd64: Binary not found at $BINARY_LINUX_AMD64"
+fi
+
+if [ -f "$BINARY_LINUX_ARM64" ]; then
+    CHECKSUM_LINUX_ARM64=$(calc_sha256 "$BINARY_LINUX_ARM64")
+    echo -e "  ${GREEN}✓${NC} linux_arm64: ${CHECKSUM_LINUX_ARM64:0:16}..."
+else
+    echo -e "  ${RED}✗${NC} linux_arm64: Binary not found at $BINARY_LINUX_ARM64"
+fi
+
+if [ -f "$BINARY_DARWIN_AMD64" ]; then
+    CHECKSUM_DARWIN_AMD64=$(calc_sha256 "$BINARY_DARWIN_AMD64")
+    echo -e "  ${GREEN}✓${NC} darwin_amd64: ${CHECKSUM_DARWIN_AMD64:0:16}..."
+else
+    echo -e "  ${RED}✗${NC} darwin_amd64: Binary not found at $BINARY_DARWIN_AMD64"
+fi
+
+if [ -f "$BINARY_DARWIN_ARM64" ]; then
+    CHECKSUM_DARWIN_ARM64=$(calc_sha256 "$BINARY_DARWIN_ARM64")
+    echo -e "  ${GREEN}✓${NC} darwin_arm64: ${CHECKSUM_DARWIN_ARM64:0:16}..."
+else
+    echo -e "  ${RED}✗${NC} darwin_arm64: Binary not found at $BINARY_DARWIN_ARM64"
+fi
+
+if [ -f "$BINARY_WINDOWS_AMD64" ]; then
+    CHECKSUM_WINDOWS_AMD64=$(calc_sha256 "$BINARY_WINDOWS_AMD64")
+    echo -e "  ${GREEN}✓${NC} windows_amd64: ${CHECKSUM_WINDOWS_AMD64:0:16}..."
+else
+    echo -e "  ${RED}✗${NC} windows_amd64: Binary not found at $BINARY_WINDOWS_AMD64"
+fi
 echo ""
 
 # Prepare provider.yaml with actual URLs and checksums
@@ -111,30 +140,32 @@ cp provider.yaml provider.yaml.tmp
 sed -i.bak "s/version: .*/version: $VERSION_NO_V/" provider.yaml.tmp
 
 # Update binary URLs and checksums
+# Update version placeholder
+sed -i.bak "s|##VERSION##|$VERSION|g" provider.yaml.tmp
+
 # Linux AMD64
-if [ ! -z "${CHECKSUMS[linux_amd64]}" ]; then
-    sed -i.bak "s|##VERSION##|$VERSION|g" provider.yaml.tmp
-    sed -i.bak "s|##CHECKSUM_LINUX_AMD64##|${CHECKSUMS[linux_amd64]}|g" provider.yaml.tmp
+if [ ! -z "$CHECKSUM_LINUX_AMD64" ]; then
+    sed -i.bak "s|##CHECKSUM_LINUX_AMD64##|$CHECKSUM_LINUX_AMD64|g" provider.yaml.tmp
 fi
 
 # Linux ARM64
-if [ ! -z "${CHECKSUMS[linux_arm64]}" ]; then
-    sed -i.bak "s|##CHECKSUM_LINUX_ARM64##|${CHECKSUMS[linux_arm64]}|g" provider.yaml.tmp
+if [ ! -z "$CHECKSUM_LINUX_ARM64" ]; then
+    sed -i.bak "s|##CHECKSUM_LINUX_ARM64##|$CHECKSUM_LINUX_ARM64|g" provider.yaml.tmp
 fi
 
 # Darwin AMD64
-if [ ! -z "${CHECKSUMS[darwin_amd64]}" ]; then
-    sed -i.bak "s|##CHECKSUM_DARWIN_AMD64##|${CHECKSUMS[darwin_amd64]}|g" provider.yaml.tmp
+if [ ! -z "$CHECKSUM_DARWIN_AMD64" ]; then
+    sed -i.bak "s|##CHECKSUM_DARWIN_AMD64##|$CHECKSUM_DARWIN_AMD64|g" provider.yaml.tmp
 fi
 
 # Darwin ARM64
-if [ ! -z "${CHECKSUMS[darwin_arm64]}" ]; then
-    sed -i.bak "s|##CHECKSUM_DARWIN_ARM64##|${CHECKSUMS[darwin_arm64]}|g" provider.yaml.tmp
+if [ ! -z "$CHECKSUM_DARWIN_ARM64" ]; then
+    sed -i.bak "s|##CHECKSUM_DARWIN_ARM64##|$CHECKSUM_DARWIN_ARM64|g" provider.yaml.tmp
 fi
 
 # Windows AMD64
-if [ ! -z "${CHECKSUMS[windows_amd64]}" ]; then
-    sed -i.bak "s|##CHECKSUM_WINDOWS_AMD64##|${CHECKSUMS[windows_amd64]}|g" provider.yaml.tmp
+if [ ! -z "$CHECKSUM_WINDOWS_AMD64" ]; then
+    sed -i.bak "s|##CHECKSUM_WINDOWS_AMD64##|$CHECKSUM_WINDOWS_AMD64|g" provider.yaml.tmp
 fi
 
 # Clean up backup files
@@ -148,11 +179,11 @@ echo -e "${BLUE}Preparing release artifacts...${NC}"
 mkdir -p release
 
 # Copy and rename binaries
-cp "${BINARIES[linux_amd64]}" "release/devpod-provider-upcloud-linux-amd64" 2>/dev/null || true
-cp "${BINARIES[linux_arm64]}" "release/devpod-provider-upcloud-linux-arm64" 2>/dev/null || true
-cp "${BINARIES[darwin_amd64]}" "release/devpod-provider-upcloud-darwin-amd64" 2>/dev/null || true
-cp "${BINARIES[darwin_arm64]}" "release/devpod-provider-upcloud-darwin-arm64" 2>/dev/null || true
-cp "${BINARIES[windows_amd64]}" "release/devpod-provider-upcloud-windows-amd64.exe" 2>/dev/null || true
+[ -f "$BINARY_LINUX_AMD64" ] && cp "$BINARY_LINUX_AMD64" "release/devpod-provider-upcloud-linux-amd64" 2>/dev/null || true
+[ -f "$BINARY_LINUX_ARM64" ] && cp "$BINARY_LINUX_ARM64" "release/devpod-provider-upcloud-linux-arm64" 2>/dev/null || true
+[ -f "$BINARY_DARWIN_AMD64" ] && cp "$BINARY_DARWIN_AMD64" "release/devpod-provider-upcloud-darwin-amd64" 2>/dev/null || true
+[ -f "$BINARY_DARWIN_ARM64" ] && cp "$BINARY_DARWIN_ARM64" "release/devpod-provider-upcloud-darwin-arm64" 2>/dev/null || true
+[ -f "$BINARY_WINDOWS_AMD64" ] && cp "$BINARY_WINDOWS_AMD64" "release/devpod-provider-upcloud-windows-amd64.exe" 2>/dev/null || true
 
 # Copy provider.yaml
 cp provider.yaml.tmp release/provider.yaml
@@ -166,7 +197,9 @@ cd release
 > checksums.txt
 for file in devpod-provider-upcloud-*; do
     if [ -f "$file" ]; then
-        calc_sha256 "$file" >> checksums.txt
+        # Calculate checksum and append with filename
+        checksum=$(calc_sha256 "$file")
+        echo "$checksum  $file" >> checksums.txt
     fi
 done
 cd ..
