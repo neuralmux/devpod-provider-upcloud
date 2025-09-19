@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-12-18
+
+### 🎉 Major Update: Server Plan Templating System
+
+This release introduces a flexible templating system for server plans, bringing massive cost savings with UpCloud's new Developer and Cloud Native plans.
+
+### Added
+
+#### Server Plan Templating System
+- **Flexible Configuration**: New YAML-based plan configuration system (`configs/server-plans.yaml`)
+- **Plan Discovery Command**: `devpod-provider-upcloud plans` command to explore available server plans
+  - `--recommended` flag to show DevPod-optimized plans
+  - `--category` filter for plan categories
+  - `--format json/yaml` for automation
+- **Smart Plan Loader**: Dynamic plan validation with fallback to legacy mappings
+- **Embedded Configuration**: Plans embedded at build time for single-binary distribution
+
+#### New Server Plans Support
+- **Developer Plans** (September 2024): 36-89% cost reduction for development workloads
+  - Plans from €3-35/month
+  - Optimized for DevPod workspaces
+  - Includes storage in price
+- **Cloud Native Plans** (December 2024): Pay-only-when-powered-on billing
+  - Perfect for ephemeral workspaces
+  - Ideal with auto-shutdown feature
+  - Storage configured separately
+
+#### Documentation
+- **`docs/SERVER-PLANS.md`**: Comprehensive user guide for server plans
+- **`docs/TEMPLATES.md`**: Technical documentation for the templating system
+- **`docs/MIGRATION.md`**: Step-by-step migration guide
+
+#### Developer Experience
+- **Quick Start Scripts**: `quickstart.sh`, `install-local.sh`, `install.sh`
+- **Credential Auto-Detection**: Automatic detection from UpCloud CLI config
+- **Plan Recommendations**: Built-in suggestions by language, framework, and workload
+
+### Changed
+- **Default Plan**: Changed from `2xCPU-4GB` (€28/mo) to `DEV-2xCPU-4GB` (€18/mo) - 36% cost reduction
+- **Provider Options**: Better organization with option groups
+- **Plan Validation**: Enhanced error messages with suggestions
+
+### Migration Notes
+Users should review the [Migration Guide](docs/MIGRATION.md) for upgrading existing workspaces.
+
+## [0.1.0] - 2024-09-13
+
 ### Added
 - Initial UpCloud DevPod provider implementation
 - Full UpCloud API integration using official SDK v8
@@ -31,15 +78,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependabot for dependency management
 - Code quality checks with golangci-lint
 - Automated testing on multiple platforms
-
-## [0.1.0] - 2024-XX-XX
-
-### Added
-- Initial release of UpCloud DevPod Provider
-- Support for all UpCloud zones and plans
-- Automatic SSH key management
-- DevPod workspace provisioning
-- Complete provider lifecycle implementation
 
 ---
 

@@ -6,16 +6,32 @@ import (
 	"strings"
 
 	"github.com/UpCloudLtd/upcloud-go-api/v8/upcloud"
+	"github.com/neuralmux/devpod-provider-upcloud/pkg/config"
 )
 
 // MapPlanName maps the provider plan name to UpCloud plan name
 func MapPlanName(plan string) (string, error) {
-	// UpCloud plans are already in the format we use (e.g., "2xCPU-4GB")
-	// Just validate it exists
-	if mappedPlan, ok := PlanMap[plan]; ok {
-		return mappedPlan, nil
+	// Load server plans configuration
+	plans, err := config.LoadServerPlans()
+	if err != nil {
+		// Fallback to legacy plan mapping if config load fails
+		if mappedPlan, ok := PlanMap[plan]; ok {
+			return mappedPlan, nil
+		}
+		return "", fmt.Errorf("failed to load plans config: %w", err)
 	}
-	return "", fmt.Errorf("unknown plan: %s", plan)
+
+	// Validate the plan exists in configuration
+	if err := plans.ValidatePlan(plan); err != nil {
+		// Check legacy map as fallback for backward compatibility
+		if mappedPlan, ok := PlanMap[plan]; ok {
+			return mappedPlan, nil
+		}
+		return "", fmt.Errorf("invalid plan: %s (use 'plans' command to list available plans)", plan)
+	}
+
+	// Plan is valid, return it
+	return plan, nil
 }
 
 // MapImageToTemplate maps the OS image name to UpCloud template UUID
@@ -64,18 +80,29 @@ func GetStorageTier() string {
 
 // ValidateZone checks if the zone is valid
 func ValidateZone(zone string) error {
-	validZones := []string{
-		"de-fra1", "fi-hel1", "fi-hel2", "nl-ams1", "uk-lon1",
-		"us-nyc1", "us-chi1", "us-sjo1", "sg-sin1", "au-syd1",
-		"es-mad1", "pl-waw1", "se-sto1",
+	// Try to load configuration for zone validation
+	plans, err := config.LoadServerPlans()
+	if err != nil {
+		// Fallback to hardcoded zones if config fails
+		validZones := []string{
+			"de-fra1", "fi-hel1", "fi-hel2", "nl-ams1", "uk-lon1",
+			"us-nyc1", "us-chi1", "us-sjo1", "sg-sin1", "au-syd1",
+			"es-mad1", "pl-waw1", "se-sto1",
+		}
+
+		for _, validZone := range validZones {
+			if zone == validZone {
+				return nil
+			}
+		}
+		return fmt.Errorf("invalid zone: %s", zone)
 	}
 
-	for _, validZone := range validZones {
-		if zone == validZone {
-			return nil
-		}
+	// Use configuration-based validation
+	if !plans.IsValidRegion(zone) {
+		return fmt.Errorf("invalid zone: %s (available: %s)", zone, strings.Join(plans.GetRegions(), ", "))
 	}
-	return fmt.Errorf("invalid zone: %s", zone)
+	return nil
 }
 
 // GenerateHostname creates a hostname from machine ID

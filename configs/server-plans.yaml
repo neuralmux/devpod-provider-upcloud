@@ -1,0 +1,468 @@
+# UpCloud Server Plans Configuration
+# This file contains all available server plans for UpCloud
+# Last updated: December 2024
+
+version: "2024.12"
+last_updated: "2024-12-18"
+default_plan: "DEV-2xCPU-4GB"
+
+categories:
+  developer:
+    name: "Developer Plans"
+    description: "Cost-effective plans optimized for development workspaces"
+    recommended_for_devpod: true
+    icon: "🚀"
+    plans:
+      - id: "DEV-1xCPU-1GB-10GB"
+        display_name: "Minimal Dev"
+        description: "Light editing and documentation"
+        cpu: 1
+        ram: 1024
+        storage: 10
+        price_monthly: 3.00
+        price_hourly: 0.004
+        use_cases:
+          - "Documentation"
+          - "Light editing"
+          - "Static sites"
+        restrictions:
+          max_per_account: 2
+
+      - id: "DEV-1xCPU-1GB"
+        display_name: "Micro Dev"
+        description: "Basic development tasks"
+        cpu: 1
+        ram: 1024
+        storage: 20
+        price_monthly: 4.50
+        price_hourly: 0.006
+        use_cases:
+          - "Simple scripts"
+          - "Learning"
+          - "Testing"
+        restrictions:
+          max_per_account: 5
+
+      - id: "DEV-1xCPU-2GB"
+        display_name: "Light Dev"
+        description: "Light development work"
+        cpu: 1
+        ram: 2048
+        storage: 30
+        price_monthly: 8.00
+        price_hourly: 0.011
+        use_cases:
+          - "Frontend development"
+          - "Simple APIs"
+          - "Small databases"
+
+      - id: "DEV-1xCPU-4GB"
+        display_name: "Solo Dev"
+        description: "Single developer workspace"
+        cpu: 1
+        ram: 4096
+        storage: 40
+        price_monthly: 15.00
+        price_hourly: 0.021
+        use_cases:
+          - "Full-stack development"
+          - "Data analysis"
+          - "Small containers"
+
+      - id: "DEV-2xCPU-4GB"
+        display_name: "Standard Dev"
+        description: "Recommended for most developers"
+        cpu: 2
+        ram: 4096
+        storage: 60
+        price_monthly: 18.00
+        price_hourly: 0.025
+        use_cases:
+          - "Web development"
+          - "API development"
+          - "Docker development"
+        default: true
+        recommended: true
+
+      - id: "DEV-2xCPU-8GB"
+        display_name: "Professional Dev"
+        description: "Professional development workspace"
+        cpu: 2
+        ram: 8192
+        storage: 80
+        price_monthly: 25.00
+        price_hourly: 0.035
+        use_cases:
+          - "Large applications"
+          - "Multiple containers"
+          - "Databases"
+        recommended: true
+
+      - id: "DEV-2xCPU-16GB"
+        display_name: "Heavy Dev"
+        description: "Resource-intensive development"
+        cpu: 2
+        ram: 16384
+        storage: 100
+        price_monthly: 35.00
+        price_hourly: 0.049
+        use_cases:
+          - "Big data processing"
+          - "Machine learning"
+          - "Large databases"
+
+  cloud_native:
+    name: "Cloud Native Plans"
+    description: "Pay only when powered on - perfect for auto-shutdown workspaces"
+    recommended_for_devpod: true
+    billed_when_on_only: true
+    icon: "☁️"
+    plans:
+      - id: "CN-1xCPU-0.5GB"
+        display_name: "Cloud Native Nano"
+        description: "Minimal containerized workloads"
+        cpu: 1
+        ram: 512
+        storage: 0  # Storage configured separately
+        price_monthly: 2.50
+        price_hourly: 0.0035
+        use_cases:
+          - "Microservices"
+          - "Simple containers"
+          - "CI/CD agents"
+
+      - id: "CN-1xCPU-1GB"
+        display_name: "Cloud Native Micro"
+        description: "Small containerized applications"
+        cpu: 1
+        ram: 1024
+        storage: 0
+        price_monthly: 4.00
+        price_hourly: 0.0056
+        use_cases:
+          - "Web services"
+          - "API endpoints"
+          - "Development containers"
+
+      - id: "CN-2xCPU-2GB"
+        display_name: "Cloud Native Small"
+        description: "Standard containerized workloads"
+        cpu: 2
+        ram: 2048
+        storage: 0
+        price_monthly: 12.00
+        price_hourly: 0.017
+        use_cases:
+          - "Application servers"
+          - "Development environments"
+          - "Testing environments"
+
+      - id: "CN-2xCPU-4GB"
+        display_name: "Cloud Native Medium"
+        description: "Medium containerized applications"
+        cpu: 2
+        ram: 4096
+        storage: 0
+        price_monthly: 16.00
+        price_hourly: 0.022
+        use_cases:
+          - "Full-stack applications"
+          - "Development workspaces"
+          - "Integration testing"
+
+  general_purpose:
+    name: "General Purpose"
+    description: "Balanced compute and memory for production workloads"
+    icon: "⚡"
+    plans:
+      - id: "1xCPU-1GB"
+        display_name: "Basic"
+        description: "Entry-level general purpose"
+        cpu: 1
+        ram: 1024
+        storage: 25
+        price_monthly: 7.00
+        price_hourly: 0.010
+        use_cases:
+          - "Small websites"
+          - "Development"
+          - "Testing"
+
+      - id: "1xCPU-2GB"
+        display_name: "Small"
+        description: "Small general purpose"
+        cpu: 1
+        ram: 2048
+        storage: 50
+        price_monthly: 14.00
+        price_hourly: 0.020
+        use_cases:
+          - "Web applications"
+          - "Small databases"
+          - "Development"
+
+      - id: "2xCPU-4GB"
+        display_name: "Medium"
+        description: "Medium general purpose"
+        cpu: 2
+        ram: 4096
+        storage: 80
+        price_monthly: 28.00
+        price_hourly: 0.040
+        use_cases:
+          - "Production apps"
+          - "Databases"
+          - "Content management"
+
+      - id: "4xCPU-8GB"
+        display_name: "Large"
+        description: "Large general purpose"
+        cpu: 4
+        ram: 8192
+        storage: 160
+        price_monthly: 56.00
+        price_hourly: 0.080
+        use_cases:
+          - "High-traffic sites"
+          - "Large databases"
+          - "Application servers"
+
+      - id: "6xCPU-16GB"
+        display_name: "Extra Large"
+        description: "Extra large general purpose"
+        cpu: 6
+        ram: 16384
+        storage: 320
+        price_monthly: 112.00
+        price_hourly: 0.160
+        use_cases:
+          - "Enterprise applications"
+          - "Data processing"
+          - "Large databases"
+
+      - id: "8xCPU-32GB"
+        display_name: "2XL"
+        description: "High-performance general purpose"
+        cpu: 8
+        ram: 32768
+        storage: 640
+        price_monthly: 224.00
+        price_hourly: 0.320
+        use_cases:
+          - "Big data"
+          - "Analytics"
+          - "High-performance computing"
+
+      - id: "12xCPU-48GB"
+        display_name: "3XL"
+        description: "Very high performance"
+        cpu: 12
+        ram: 49152
+        storage: 960
+        price_monthly: 336.00
+        price_hourly: 0.480
+        use_cases:
+          - "Data warehousing"
+          - "Scientific computing"
+          - "Large-scale processing"
+
+      - id: "16xCPU-64GB"
+        display_name: "4XL"
+        description: "Maximum general purpose"
+        cpu: 16
+        ram: 65536
+        storage: 1280
+        price_monthly: 448.00
+        price_hourly: 0.640
+        use_cases:
+          - "Enterprise databases"
+          - "Big data analytics"
+          - "High-performance computing"
+
+      - id: "20xCPU-96GB"
+        display_name: "5XL"
+        description: "Ultra high performance"
+        cpu: 20
+        ram: 98304
+        storage: 1920
+        price_monthly: 672.00
+        price_hourly: 0.960
+        use_cases:
+          - "Mission-critical apps"
+          - "Large-scale analytics"
+          - "Enterprise workloads"
+
+  high_cpu:
+    name: "High CPU"
+    description: "CPU-optimized for compute-intensive workloads"
+    icon: "🔥"
+    plans:
+      - id: "HCPU-2xCPU-4GB"
+        display_name: "High CPU Small"
+        description: "CPU-optimized small instance"
+        cpu: 2
+        ram: 4096
+        storage: 50
+        price_monthly: 35.00
+        price_hourly: 0.050
+        use_cases:
+          - "Build servers"
+          - "Video encoding"
+          - "Batch processing"
+
+      - id: "HCPU-4xCPU-8GB"
+        display_name: "High CPU Medium"
+        description: "CPU-optimized medium instance"
+        cpu: 4
+        ram: 8192
+        storage: 100
+        price_monthly: 70.00
+        price_hourly: 0.100
+        use_cases:
+          - "CI/CD pipelines"
+          - "Code compilation"
+          - "Data processing"
+
+      - id: "HCPU-8xCPU-16GB"
+        display_name: "High CPU Large"
+        description: "CPU-optimized large instance"
+        cpu: 8
+        ram: 16384
+        storage: 200
+        price_monthly: 140.00
+        price_hourly: 0.200
+        use_cases:
+          - "Scientific computing"
+          - "3D rendering"
+          - "Machine learning training"
+
+      - id: "HCPU-16xCPU-32GB"
+        display_name: "High CPU XL"
+        description: "CPU-optimized extra large"
+        cpu: 16
+        ram: 32768
+        storage: 400
+        price_monthly: 280.00
+        price_hourly: 0.400
+        use_cases:
+          - "HPC workloads"
+          - "Large-scale simulations"
+          - "Video processing"
+
+  high_memory:
+    name: "High Memory"
+    description: "Memory-optimized for data-intensive applications"
+    icon: "💾"
+    plans:
+      - id: "HMEM-2xCPU-16GB"
+        display_name: "High Memory Small"
+        description: "Memory-optimized small instance"
+        cpu: 2
+        ram: 16384
+        storage: 100
+        price_monthly: 70.00
+        price_hourly: 0.100
+        use_cases:
+          - "In-memory databases"
+          - "Caching servers"
+          - "Real-time analytics"
+
+      - id: "HMEM-4xCPU-32GB"
+        display_name: "High Memory Medium"
+        description: "Memory-optimized medium instance"
+        cpu: 4
+        ram: 32768
+        storage: 200
+        price_monthly: 140.00
+        price_hourly: 0.200
+        use_cases:
+          - "Large databases"
+          - "Data warehousing"
+          - "Memory caching"
+
+      - id: "HMEM-8xCPU-64GB"
+        display_name: "High Memory Large"
+        description: "Memory-optimized large instance"
+        cpu: 8
+        ram: 65536
+        storage: 400
+        price_monthly: 280.00
+        price_hourly: 0.400
+        use_cases:
+          - "Big data processing"
+          - "Large-scale analytics"
+          - "Enterprise databases"
+
+      - id: "HMEM-16xCPU-128GB"
+        display_name: "High Memory XL"
+        description: "Memory-optimized extra large"
+        cpu: 16
+        ram: 131072
+        storage: 800
+        price_monthly: 560.00
+        price_hourly: 0.800
+        use_cases:
+          - "SAP HANA"
+          - "Large data lakes"
+          - "Real-time processing"
+
+# Plan selection rules for DevPod
+selection_rules:
+  # Minimum requirements for DevPod
+  minimum:
+    cpu: 1
+    ram: 1024
+    storage: 10
+
+  # Recommended specs for different workloads
+  recommendations:
+    default: "DEV-2xCPU-4GB"
+
+    by_language:
+      javascript: "DEV-2xCPU-4GB"
+      typescript: "DEV-2xCPU-4GB"
+      python: "DEV-2xCPU-8GB"
+      java: "DEV-2xCPU-8GB"
+      go: "DEV-2xCPU-4GB"
+      rust: "DEV-2xCPU-8GB"
+      cpp: "HCPU-4xCPU-8GB"
+
+    by_framework:
+      react: "DEV-2xCPU-4GB"
+      angular: "DEV-2xCPU-8GB"
+      vue: "DEV-2xCPU-4GB"
+      django: "DEV-2xCPU-8GB"
+      rails: "DEV-2xCPU-8GB"
+      spring: "DEV-2xCPU-16GB"
+      dotnet: "DEV-2xCPU-8GB"
+
+    by_workload:
+      frontend: "DEV-1xCPU-4GB"
+      backend: "DEV-2xCPU-4GB"
+      fullstack: "DEV-2xCPU-8GB"
+      database: "DEV-2xCPU-16GB"
+      ml_development: "HCPU-8xCPU-16GB"
+      data_science: "HMEM-4xCPU-32GB"
+      containers: "DEV-2xCPU-8GB"
+      microservices: "CN-2xCPU-4GB"
+
+# Metadata for plan management
+metadata:
+  provider: "UpCloud"
+  api_version: "v8"
+  currency: "EUR"
+  billing_unit: "hourly"
+  regions_available:
+    - de-fra1
+    - fi-hel1
+    - fi-hel2
+    - nl-ams1
+    - uk-lon1
+    - us-nyc1
+    - us-chi1
+    - us-sjo1
+    - sg-sin1
+    - au-syd1
+    - es-mad1
+    - pl-waw1
+    - se-sto1

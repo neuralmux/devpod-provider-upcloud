@@ -5,25 +5,37 @@ description: |-
 icon: https://upcloud.com/favicon.ico
 optionGroups:
   - options:
+      - UPCLOUD_USERNAME
+      - UPCLOUD_PASSWORD
+      - UPCLOUD_ZONE
+    name: "UpCloud Credentials"
+    defaultVisible: true
+  - options:
+      - UPCLOUD_PLAN
       - UPCLOUD_STORAGE
       - UPCLOUD_IMAGE
-      - UPCLOUD_PLAN
-    name: "UpCloud options"
+    name: "Server Configuration"
+    defaultVisible: true
   - options:
       - AGENT_PATH
       - AGENT_DATA_PATH
       - INACTIVITY_TIMEOUT
       - INJECT_DOCKER_CREDENTIALS
       - INJECT_GIT_CREDENTIALS
-    name: "Agent options"
+    name: "Advanced Options"
+    defaultVisible: false
 options:
   UPCLOUD_USERNAME:
     description: The UpCloud API username to use.
     required: true
     password: false
     command: |-
+      # Try to get from environment first
       if [ ! -z "${UPCLOUD_USERNAME}" ]; then
-        echo ${UPCLOUD_USERNAME}
+        printf "%s" "${UPCLOUD_USERNAME}"
+      # Try to read from UpCloud CLI config if exists
+      elif [ -f "$HOME/.config/upcloud/config.json" ]; then
+        cat "$HOME/.config/upcloud/config.json" 2>/dev/null | grep -o '"username":"[^"]*' | grep -o '[^"]*$' || true
       fi
 
   UPCLOUD_PASSWORD:
@@ -31,8 +43,12 @@ options:
     required: true
     password: true
     command: |-
+      # Try to get from environment first
       if [ ! -z "${UPCLOUD_PASSWORD}" ]; then
-        echo ${UPCLOUD_PASSWORD}
+        printf "%s" "${UPCLOUD_PASSWORD}"
+      # Try to read from UpCloud CLI config if exists
+      elif [ -f "$HOME/.config/upcloud/config.json" ]; then
+        cat "$HOME/.config/upcloud/config.json" 2>/dev/null | grep -o '"password":"[^"]*' | grep -o '[^"]*$' || true
       fi
 
   UPCLOUD_ZONE:
@@ -67,15 +83,23 @@ options:
       - AlmaLinux 9
 
   UPCLOUD_PLAN:
-    description: The server plan to use.
-    default: 2xCPU-4GB
+    description: "Server plan (run 'devpod-provider-upcloud plans' to list all available plans)"
+    default: DEV-2xCPU-4GB
     suggestions:
-      - 1xCPU-1GB
-      - 1xCPU-2GB
-      - 2xCPU-4GB
-      - 4xCPU-8GB
-      - 6xCPU-16GB
-      - 8xCPU-32GB
+      # Developer Plans (Recommended for DevPod - Best Value)
+      - DEV-1xCPU-1GB-10GB  # €3/month - Minimal dev
+      - DEV-1xCPU-2GB       # €8/month - Light dev
+      - DEV-2xCPU-4GB       # €18/month - Standard dev (DEFAULT)
+      - DEV-2xCPU-8GB       # €25/month - Professional dev
+      - DEV-2xCPU-16GB      # €35/month - Heavy dev
+      # Cloud Native Plans (Pay only when powered on)
+      - CN-1xCPU-1GB        # €4/month - Microservices
+      - CN-2xCPU-2GB        # €12/month - Small containers
+      - CN-2xCPU-4GB        # €16/month - Medium containers
+      # General Purpose (Legacy - Higher cost)
+      - 1xCPU-1GB           # €7/month - Basic
+      - 2xCPU-4GB           # €28/month - Medium
+      - 4xCPU-8GB           # €56/month - Large
 
   INACTIVITY_TIMEOUT:
     description: If defined, will automatically stop the VM after the inactivity period.

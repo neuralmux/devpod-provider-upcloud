@@ -33,15 +33,34 @@ const (
 	DefaultTimeout     = 300 // seconds
 )
 
-// Plan mappings - UpCloud uses simple plan names like "1xCPU-1GB"
-// These map directly to UpCloud's plan naming convention
+// Plan mappings - Legacy mapping for backward compatibility
+// New plans are loaded from configs/server-plans.yaml
 var PlanMap = map[string]string{
-	"1xCPU-1GB":  "1xCPU-1GB",
-	"1xCPU-2GB":  "1xCPU-2GB",
-	"2xCPU-4GB":  "2xCPU-4GB",
-	"4xCPU-8GB":  "4xCPU-8GB",
-	"6xCPU-16GB": "6xCPU-16GB",
-	"8xCPU-32GB": "8xCPU-32GB",
+	// Developer Plans (New - Sept 2024)
+	"DEV-1xCPU-1GB-10GB": "DEV-1xCPU-1GB-10GB",
+	"DEV-1xCPU-1GB":      "DEV-1xCPU-1GB",
+	"DEV-1xCPU-2GB":      "DEV-1xCPU-2GB",
+	"DEV-1xCPU-4GB":      "DEV-1xCPU-4GB",
+	"DEV-2xCPU-4GB":      "DEV-2xCPU-4GB",
+	"DEV-2xCPU-8GB":      "DEV-2xCPU-8GB",
+	"DEV-2xCPU-16GB":     "DEV-2xCPU-16GB",
+
+	// Cloud Native Plans (New - Dec 2024)
+	"CN-1xCPU-0.5GB": "CN-1xCPU-0.5GB",
+	"CN-1xCPU-1GB":   "CN-1xCPU-1GB",
+	"CN-2xCPU-2GB":   "CN-2xCPU-2GB",
+	"CN-2xCPU-4GB":   "CN-2xCPU-4GB",
+
+	// General Purpose Plans (Legacy)
+	"1xCPU-1GB":   "1xCPU-1GB",
+	"1xCPU-2GB":   "1xCPU-2GB",
+	"2xCPU-4GB":   "2xCPU-4GB",
+	"4xCPU-8GB":   "4xCPU-8GB",
+	"6xCPU-16GB":  "6xCPU-16GB",
+	"8xCPU-32GB":  "8xCPU-32GB",
+	"12xCPU-48GB": "12xCPU-48GB",
+	"16xCPU-64GB": "16xCPU-64GB",
+	"20xCPU-96GB": "20xCPU-96GB",
 }
 
 // OS Image name to template UUID mapping

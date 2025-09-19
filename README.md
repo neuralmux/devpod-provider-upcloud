@@ -11,12 +11,14 @@ The official UpCloud provider for [DevPod](https://github.com/loft-sh/devpod) en
 ## Features
 
 - 🚀 **Quick Setup** - Create development environments in under 2 minutes
+- 💰 **Developer Plans** - Save 36-89% with plans starting at €3/month
+- 📊 **Smart Plan Selection** - Built-in `plans` command helps choose the perfect server
 - 🔐 **SSH Key Authentication** - Secure access with automatic SSH key injection
 - 🌍 **Global Zones** - Deploy to 13+ data centers worldwide
 - 💾 **Flexible Storage** - Configurable SSD storage with MaxIOPS tier
 - 🔄 **Full Lifecycle Management** - Create, start, stop, and delete servers
 - 🎯 **Auto-configuration** - Cloud-init support for automatic environment setup
-- 💰 **Cost-effective** - Auto-stop functionality to save on idle resources
+- ⏱️ **Auto-shutdown** - Save costs by stopping idle workspaces automatically
 
 ## What are Providers?
 
@@ -37,9 +39,24 @@ To use this provider in your DevPod setup, you will need to do the following ste
 
 ## Installation
 
-### Using the CLI
+### Quick Start (Recommended)
 
+The fastest way to get started:
+
+```bash
+# Download and run the quick start script
+curl -fsSL https://raw.githubusercontent.com/neuralmux/devpod-provider-upcloud/main/quickstart.sh | bash
 ```
+
+This script will:
+- Install DevPod if not present
+- Configure UpCloud credentials
+- Set up the provider
+- Show you how to create your first workspace
+
+### Manual Installation
+
+```bash
 devpod provider add github.com/neuralmux/devpod-provider-upcloud
 devpod provider use github.com/neuralmux/devpod-provider-upcloud
 ```
@@ -76,7 +93,7 @@ Enter "github.com/neuralmux/devpod-provider-upcloud" or "neuralmux/devpod-provid
 | Option | Description | Default | Environment Variable |
 |--------|-------------|---------|---------------------|
 | Zone | Data center location | `de-fra1` | `UPCLOUD_ZONE` |
-| Plan | Server size | `2xCPU-4GB` | `UPCLOUD_PLAN` |
+| Plan | Server size ([see available plans](#server-plans)) | `DEV-2xCPU-4GB` | `UPCLOUD_PLAN` |
 | Storage | Disk size in GB | `50` | `UPCLOUD_STORAGE` |
 | Image | Operating system | `Ubuntu 22.04` | `UPCLOUD_IMAGE` |
 
@@ -86,10 +103,39 @@ Enter "github.com/neuralmux/devpod-provider-upcloud" or "neuralmux/devpod-provid
 - 🇺🇸 **Americas**: us-nyc1, us-chi1, us-sjo1
 - 🌏 **Asia-Pacific**: sg-sin1, au-syd1
 
-### Available Plans
+## Server Plans
 
-- **Development**: 1xCPU-1GB, 1xCPU-2GB, 2xCPU-4GB
-- **Professional**: 4xCPU-8GB, 6xCPU-16GB, 8xCPU-32GB
+> 💡 **New in v0.2.0**: Intelligent plan templating system with UpCloud's latest Developer and Cloud Native plans
+
+### Quick Plan Selection
+
+```bash
+# Discover available plans
+devpod-provider-upcloud plans --recommended
+
+# View specific category
+devpod-provider-upcloud plans --category developer
+```
+
+### Recommended Plans
+
+| Plan | Specs | Price | Best For |
+|------|-------|-------|----------|
+| **DEV-1xCPU-1GB-10GB** | 1 CPU, 1GB RAM, 10GB | €3/mo | Minimal development |
+| **DEV-2xCPU-4GB** ⭐ | 2 CPU, 4GB RAM, 60GB | €18/mo | **Default** - Most developers |
+| **DEV-2xCPU-8GB** | 2 CPU, 8GB RAM, 80GB | €25/mo | Professional development |
+| **CN-2xCPU-4GB** | 2 CPU, 4GB RAM | €16/mo* | Pay-per-use workspaces |
+
+*Cloud Native plans bill only when powered on
+
+### Cost Savings
+
+Compared to traditional General Purpose plans:
+- **36-89% lower cost** for development workloads
+- **€10/month saved** on the default plan alone
+- **Pay-as-you-go** option with Cloud Native plans
+
+📚 **[View Full Plan Documentation](docs/SERVER-PLANS.md)** | **[Migration Guide](docs/MIGRATION.md)**
 
 ## Usage
 
@@ -120,14 +166,36 @@ Enter "github.com/neuralmux/devpod-provider-upcloud" or "neuralmux/devpod-provid
 git clone https://github.com/neuralmux/devpod-provider-upcloud.git
 cd devpod-provider-upcloud
 
-# Run development setup
+# Run development setup (installs tools and dependencies)
 ./scripts/dev-setup.sh
 
-# Build the provider
+# Build and install locally for testing
+./install-local.sh
+
+# Or manually build
 make build
 
 # Run all tests
 make test-all
+```
+
+### Local Development Setup
+
+For rapid development and testing:
+
+```bash
+# Install the provider locally (builds and adds as 'upcloud-local')
+./install-local.sh
+
+# Test with mock mode (no API calls)
+export UPCLOUD_USERNAME=test
+export UPCLOUD_PASSWORD=test
+devpod up . --provider upcloud-local --debug
+
+# Test with real API
+export UPCLOUD_USERNAME="your-api-username"
+export UPCLOUD_PASSWORD="your-api-password"
+devpod up . --provider upcloud-local --debug
 ```
 
 ### Development Workflow
@@ -203,15 +271,27 @@ This provider uses the official [UpCloud Go SDK v8](https://github.com/UpCloudLt
 │   ├── start.go           # Server start
 │   ├── stop.go            # Server stop
 │   ├── status.go          # Server status
-│   └── command.go         # Command execution
-├── pkg/                   
+│   ├── command.go         # Command execution
+│   └── plans.go           # Plan listing and discovery
+├── pkg/
 │   ├── upcloud/           # UpCloud API client
 │   │   ├── client.go      # Main client implementation
 │   │   ├── constants.go   # UpCloud-specific constants
 │   │   ├── mapper.go      # Resource mapping utilities
 │   │   └── errors.go      # Error handling
-│   └── options/           # Configuration management
-│       └── options.go     # Environment variable parsing
+│   ├── options/           # Configuration management
+│   │   └── options.go     # Environment variable parsing
+│   └── config/            # Plan templating system
+│       ├── plans.go       # Plan configuration loader
+│       └── server-plans.yaml # Embedded plan definitions
+├── configs/               # Configuration files
+│   └── server-plans.yaml  # Master plan definitions
+├── docs/                  # Documentation
+│   ├── SERVER-PLANS.md    # User guide for server plans
+│   ├── TEMPLATES.md       # Technical templating docs
+│   ├── MIGRATION.md       # Migration guide
+│   ├── developing-providers.md # DevPod provider guide
+│   └── prd.md            # Product requirements
 ├── features/              # BDD test specifications
 ├── scripts/               # Development and CI/CD scripts
 ├── .github/workflows/     # GitHub Actions CI/CD
