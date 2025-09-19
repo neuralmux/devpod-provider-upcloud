@@ -59,17 +59,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare provider.yaml with version and placeholders
-        run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          VERSION=${TAG#v}
-
-          # Update version in provider.yaml
-          sed -i "s/version: .*/version: $VERSION/" provider.yaml
-
-          # Ensure placeholders are in provider.yaml for checksums
-          # These will be replaced after GoReleaser builds the binaries
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         id: goreleaser
@@ -128,6 +117,12 @@ jobs:
           TAG=${GITHUB_REF#refs/tags/}
           VERSION=${TAG#v}
 
+          # Create a copy of provider.yaml for release
+          cp provider.yaml provider-release.yaml
+
+          # Update version in the release copy
+          sed -i "s/version: .*/version: $VERSION/" provider-release.yaml
+
           # Function to calculate SHA256
           calc_sha256() {
             if command -v sha256sum >/dev/null 2>&1; then
@@ -179,21 +174,23 @@ jobs:
 
           cd ..
 
-          # Update URLs and checksums in provider.yaml directly
-          sed -i "s|##VERSION##|$TAG|g" provider.yaml
-          sed -i "s|##CHECKSUM_LINUX_AMD64##|$LINUX_AMD64_SHA|g" provider.yaml
-          sed -i "s|##CHECKSUM_LINUX_ARM64##|$LINUX_ARM64_SHA|g" provider.yaml
-          sed -i "s|##CHECKSUM_DARWIN_AMD64##|$DARWIN_AMD64_SHA|g" provider.yaml
-          sed -i "s|##CHECKSUM_DARWIN_ARM64##|$DARWIN_ARM64_SHA|g" provider.yaml
-          sed -i "s|##CHECKSUM_WINDOWS_AMD64##|$WINDOWS_AMD64_SHA|g" provider.yaml
+          # Update URLs and checksums in the release copy
+          sed -i "s|##VERSION##|$TAG|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_LINUX_AMD64##|$LINUX_AMD64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_LINUX_ARM64##|$LINUX_ARM64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_DARWIN_AMD64##|$DARWIN_AMD64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_DARWIN_ARM64##|$DARWIN_ARM64_SHA|g" provider-release.yaml
+          sed -i "s|##CHECKSUM_WINDOWS_AMD64##|$WINDOWS_AMD64_SHA|g" provider-release.yaml
 
-          echo "Provider.yaml updated with checksums"
+          echo "Provider-release.yaml created with checksums"
 
       - name: Upload provider.yaml to release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: provider.yaml
-          tag_name: ${{ github.ref_name }}
+        run: |
+          # Upload the release version of provider.yaml
+          gh release upload ${{ github.ref_name }} provider-release.yaml --clobber
+          # Rename it to provider.yaml in the release
+          mv provider-release.yaml provider.yaml
+          gh release upload ${{ github.ref_name }} provider.yaml --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
