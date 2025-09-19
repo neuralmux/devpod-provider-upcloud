@@ -80,7 +80,7 @@ func (c *Client) Create(ctx context.Context, config *ServerConfig) error {
 	if c.service == nil {
 		fmt.Fprintf(os.Stderr, "Test mode: Simulating server creation for %s\n", config.Hostname)
 		// Track state using environment variable for test mode
-		os.Setenv("TEST_SERVER_STATE_"+config.Hostname, "Running")
+		_ = os.Setenv("TEST_SERVER_STATE_"+config.Hostname, "Running")
 		return nil
 	}
 
@@ -196,7 +196,7 @@ func (c *Client) Delete(ctx context.Context, serverID string) error {
 	if c.service == nil {
 		fmt.Fprintf(os.Stderr, "Test mode: Simulating server deletion for %s\n", serverID)
 		// Track state using environment variable for test mode
-		os.Setenv("TEST_SERVER_STATE_"+serverID, "NotFound")
+		_ = os.Setenv("TEST_SERVER_STATE_"+serverID, "NotFound")
 		return nil
 	}
 
@@ -247,7 +247,7 @@ func (c *Client) Start(ctx context.Context, serverID string) error {
 	if c.service == nil {
 		fmt.Fprintf(os.Stderr, "Test mode: Simulating server start for %s\n", serverID)
 		// Track state using environment variable for test mode
-		os.Setenv("TEST_SERVER_STATE_"+serverID, "Running")
+		_ = os.Setenv("TEST_SERVER_STATE_"+serverID, "Running")
 		return nil
 	}
 
@@ -290,7 +290,7 @@ func (c *Client) Stop(ctx context.Context, serverID string) error {
 	if c.service == nil {
 		fmt.Fprintf(os.Stderr, "Test mode: Simulating server stop for %s\n", serverID)
 		// Track state using environment variable for test mode
-		os.Setenv("TEST_SERVER_STATE_"+serverID, "Stopped")
+		_ = os.Setenv("TEST_SERVER_STATE_"+serverID, "Stopped")
 		return nil
 	}
 

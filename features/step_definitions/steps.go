@@ -12,10 +12,9 @@ import (
 
 // providerContext holds the test context for BDD scenarios
 type providerContext struct {
-	credentials  credentials
-	serverID     string
-	serverStatus string
-	lastError    error
+	credentials credentials
+	serverID    string
+	lastError   error
 }
 
 type credentials struct {
@@ -159,7 +158,7 @@ func (p *providerContext) theStatusShouldReturn(expectedStatus string) error {
 	err := statusCmd.Execute()
 
 	// Restore stdout
-	w.Close()
+	_ = w.Close()
 	out, _ := io.ReadAll(r)
 	os.Stdout = oldStdout
 
