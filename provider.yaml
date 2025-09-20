@@ -2,7 +2,7 @@ name: upcloud
 version: 0.1.0
 description: |-
   DevPod on UpCloud
-icon: https://github.com/neuralmux/devpod-provider-upcloud/blob/main/assets/cloudmark.png
+icon: https://raw.githubusercontent.com/neuralmux/devpod-provider-upcloud/main/assets/cloudmark.png
 optionGroups:
   - options:
       - UPCLOUD_USERNAME

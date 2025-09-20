@@ -42,7 +42,8 @@ func NewUpCloud(username, password string) *Client {
 	}
 
 	// Create client with timeout
-	httpClient := client.New(username, password, client.WithTimeout(time.Second*30))
+	// Use longer timeout to handle slow server operations (start, stop, create)
+	httpClient := client.New(username, password, client.WithTimeout(time.Second*120))
 
 	// Create service
 	svc := service.New(httpClient)
