@@ -108,7 +108,7 @@ jobs:
           UPCLOUD_USERNAME=test UPCLOUD_PASSWORD=test ./bin/devpod-provider-upcloud init
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: binary-${{ runner.os }}
           path: bin/devpod-provider-upcloud
