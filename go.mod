@@ -8,7 +8,7 @@ require (
 	github.com/loft-sh/devpod v0.7.0-alpha.34
 	github.com/loft-sh/log v0.0.0-20250409101748-50124f882858
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	golang.org/x/crypto v0.42.0
 	gopkg.in/yaml.v3 v3.0.1
 )
