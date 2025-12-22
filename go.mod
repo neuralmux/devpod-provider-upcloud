@@ -3,7 +3,7 @@ module github.com/neuralmux/devpod-provider-upcloud
 go 1.25.1
 
 require (
-	github.com/UpCloudLtd/upcloud-go-api/v8 v8.27.0
+	github.com/UpCloudLtd/upcloud-go-api/v8 v8.32.0
 	github.com/cucumber/godog v0.15.1
 	github.com/loft-sh/devpod v0.7.0-alpha.34
 	github.com/loft-sh/log v0.0.0-20250409101748-50124f882858
